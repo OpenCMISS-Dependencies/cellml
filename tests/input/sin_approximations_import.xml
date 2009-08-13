@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<model
+    name="sin_approximations_import"
+    cmeta:id="sin_approximations_import"
+    xmlns="http://www.cellml.org/cellml/1.1#"
+    xmlns:cellml="http://www.cellml.org/cellml/1.1#"
+    xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+      xmlns:bqs="http://www.cellml.org/bqs/1.0#"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:dcterms="http://purl.org/dc/terms/"
+      xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#"
+      xmlns:cs="http://www.cellml.org/metadata/simulation/1.0#"
+      xmlns:cg="http://www.cellml.org/metadata/graphs/1.0#">
+    <rdf:Description rdf:about="">
+      <dc:creator rdf:parseType="Resource">
+        <vCard:N rdf:parseType="Resource">
+          <vCard:Family>Nickerson</vCard:Family>
+          <vCard:Given>David</vCard:Given>
+        </vCard:N>
+        <vCard:EMAIL rdf:parseType="Resource">
+          <rdf:value>david.nickerson@nus.edu.sg</rdf:value>
+          <rdf:type rdf:resource="http://imc.org/vCard/3.0#internet" />
+        </vCard:EMAIL>
+        <vCard:ORG rdf:parseType="Resource">
+          <vCard:Orgname>National University of Singapore</vCard:Orgname>
+          <vCard:Orgunit>Division of Bioengineering</vCard:Orgunit>
+        </vCard:ORG>
+      </dc:creator>
+      <dcterms:created rdf:parseType="Resource">
+        <dcterms:W3CDTF>2006-12-21</dcterms:W3CDTF>
+      </dcterms:created>
+    </rdf:Description>
+    <rdf:Description rdf:about="#sin_approximations_import">
+      <dc:title>
+        Simple sine approximations model for testing - import version.
+      </dc:title>
+      <cmeta:comment rdf:parseType="Resource">
+        <rdf:value>
+          A very simple model describing different ways to calculate sine(x)
+          over the range 0 to 2*pi and using imports.
+        </rdf:value>
+        <dc:creator rdf:parseType="Resource">
+          <vCard:FN>David Nickerson</vCard:FN>
+        </dc:creator>
+      </cmeta:comment>
+      <cs:simulation>
+        <rdf:Description rdf:ID="simulation_of_sine">
+          <cs:simulationName>sine approximations</cs:simulationName>
+          <cs:multistepMethod>adams</cs:multistepMethod>
+          <cs:iterationMethod>functional</cs:iterationMethod>
+          <cs:boundIntervals rdf:parseType="Collection">
+            <rdf:Description>
+              <cs:boundVariable>
+                <rdf:Description rdf:about="#x"/>
+              </cs:boundVariable>
+              <cs:maximumStepSize 
+                rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                0.1
+              </cs:maximumStepSize>
+              <cs:tabulationStepSize
+                rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                0.5
+              </cs:tabulationStepSize>
+              <cs:startingValue
+                rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                0
+              </cs:startingValue>
+              <cs:endingValue
+                rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                6.283185307179586232
+              </cs:endingValue>
+            </rdf:Description>
+          </cs:boundIntervals>
+        </rdf:Description>
+      </cs:simulation>
+      <cg:graph>
+        <rdf:Description rdf:ID="sine_approximations_plot">
+          <cg:title>sin(x) approximations</cg:title>
+        <cg:x-label>x ()</cg:x-label>
+        <cg:y-label>y ()</cg:y-label>
+          <cg:background-colour>#000000</cg:background-colour>
+          <cg:traces rdf:parseType="Collection">
+            <rdf:Description>
+              <cg:label>y = sin(x)</cg:label>
+              <cg:type rdf:resource="http://www.cellml.org/metadata/graphs/1.0#line"/>
+              <cg:colour>#ff0000</cg:colour>
+              <cg:x-variable rdf:parseType="Resource">
+                <cs:simulation rdf:resource="#simulation_of_sine"/>
+                <cg:variable rdf:resource="#x"/>
+              </cg:x-variable>
+              <cg:y-variable rdf:parseType="Resource">
+                <cs:simulation rdf:resource="#simulation_of_sine"/>
+                <cg:variable rdf:resource="#sin"/>
+              </cg:y-variable>
+            </rdf:Description>
+            <rdf:Description>
+              <cg:label>dy/dx = cos(x)</cg:label>
+              <cg:type rdf:resource="http://www.cellml.org/metadata/graphs/1.0#scatter"/>
+              <cg:colour>#0000ff</cg:colour>
+              <cg:glyph rdf:resource="http://www.cellml.org/metadata/graphs/1.0#plus"/>
+              <cg:x-variable rdf:parseType="Resource">
+                <cs:simulation rdf:resource="#simulation_of_sine"/>
+                <cg:variable rdf:resource="#x"/>
+              </cg:x-variable>
+              <cg:y-variable rdf:parseType="Resource">
+                <cs:simulation rdf:resource="#simulation_of_sine"/>
+                <cg:variable rdf:resource="#deriv_approx"/>
+              </cg:y-variable>
+            </rdf:Description>
+            <rdf:Description>
+              <cg:label>parabolic approx.</cg:label>
+              <cg:type rdf:resource="http://www.cellml.org/metadata/graphs/1.0#scatter"/>
+              <cg:colour>#00ff00</cg:colour>
+              <cg:glyph rdf:resource="http://www.cellml.org/metadata/graphs/1.0#cross"/>
+              <cg:x-variable rdf:parseType="Resource">
+                <cs:simulation rdf:resource="#simulation_of_sine"/>
+                <cg:variable rdf:resource="#x"/>
+              </cg:x-variable>
+              <cg:y-variable rdf:parseType="Resource">
+                <cs:simulation rdf:resource="#simulation_of_sine"/>
+                <cg:variable rdf:resource="#parabolic_approx"/>
+              </cg:y-variable>
+            </rdf:Description>
+          </cg:traces>
+        </rdf:Description>
+      </cg:graph>
+    </rdf:Description>
+  </rdf:RDF>
+
+  <import xlink:href="sin.xml">
+    <component name="actual_sin" component_ref="sin"/>
+  </import>
+  <import xlink:href="deriv_approx_sin.xml">
+    <component name="deriv_approx_sin" component_ref="sin"/>
+  </import>
+  <import xlink:href="parabolic_approx_sin.xml">
+    <component name="parabolic_approx_sin" component_ref="sin"/>
+  </import>
+
+  <component name="main" cmeta:id="main">
+    <variable cmeta:id="x" name="x" initial_value="0" units="dimensionless" public_interface="out" private_interface="out"/>
+    <variable cmeta:id="sin" name="sin1" units="dimensionless" public_interface="out" private_interface="in"/>
+    <variable cmeta:id="deriv_approx" name="sin2" units="dimensionless" public_interface="out" private_interface="in"/>
+    <variable cmeta:id="deriv_approx_initial_value" name="deriv_approx_initial_value" initial_value="0" units="dimensionless" public_interface="out" private_interface="out"/>
+    <variable cmeta:id="parabolic_approx" name="sin3" units="dimensionless" public_interface="out" private_interface="in"/>
+  </component>
+  
+  <group>
+    <relationship_ref relationship="encapsulation"/>
+    <component_ref component="main">
+      <component_ref component="actual_sin"/>
+      <component_ref component="deriv_approx_sin"/>
+      <component_ref component="parabolic_approx_sin"/>
+    </component_ref>
+  </group>
+  
+  <connection>
+    <map_components component_1="actual_sin" component_2="main"/>
+    <map_variables variable_1="sin" variable_2="sin1"/>
+    <map_variables variable_1="x" variable_2="x"/>
+  </connection>
+  
+  <connection>
+    <map_components component_1="deriv_approx_sin" component_2="main"/>
+    <map_variables variable_1="sin" variable_2="sin2"/>
+    <map_variables variable_1="x" variable_2="x"/>
+    <map_variables variable_1="sin_initial_value" variable_2="deriv_approx_initial_value"/>
+  </connection>
+
+  <connection>
+    <map_components component_1="parabolic_approx_sin" component_2="main"/>
+    <map_variables variable_1="sin" variable_2="sin3"/>
+    <map_variables variable_1="x" variable_2="x"/>
+  </connection>
+
+</model>

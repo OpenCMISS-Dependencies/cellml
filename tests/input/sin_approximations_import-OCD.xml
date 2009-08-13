@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+    xmlns:cs="http://www.cellml.org/metadata/simulation/1.0#"
+    xmlns:oc="http://opencmiss.sourceforge.net/cellml-models/1.0#">
+    <rdf:Description rdf:about="sin_approximations_import.xml#sin_approximations_import">
+      <cs:simulation>
+        <rdf:Description rdf:ID="simulation_of_sine">
+          <cs:simulationName>sine approximations</cs:simulationName>
+          <cs:multistepMethod>adams</cs:multistepMethod>
+          <cs:iterationMethod>functional</cs:iterationMethod>
+          <cs:boundIntervals rdf:parseType="Collection">
+            <rdf:Description>
+              <cs:boundVariable>
+                <rdf:Description rdf:about="sin_approximations_import.xml#x"/>
+              </cs:boundVariable>
+              <cs:maximumStepSize 
+                rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                0.1
+              </cs:maximumStepSize>
+              <cs:tabulationStepSize
+                rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                0.5
+              </cs:tabulationStepSize>
+              <cs:startingValue
+                rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                0
+              </cs:startingValue>
+              <cs:endingValue
+                rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                6.283185307179586232
+              </cs:endingValue>
+            </rdf:Description>
+          </cs:boundIntervals>
+        </rdf:Description>
+      </cs:simulation>
+    </rdf:Description>
+    <rdf:Description rdf:about="sin.xml#sin">
+      <oc:is-a rdf:resource="urn:opencmiss:cellml:MembranePotential"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="parabolic_approx_sin.xml#sin">
+      <oc:is-a rdf:resource="urn:opencmiss:cellml:AppliedStimulusCurrent"/>
+    </rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<model
+    name="sin"
+    cmeta:id="sin"
+    xmlns="http://www.cellml.org/cellml/1.1#"
+    xmlns:cellml="http://www.cellml.org/cellml/1.1#"
+    xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+  <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+      xmlns:bqs="http://www.cellml.org/bqs/1.0#"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:dcterms="http://purl.org/dc/terms/"
+      xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#"
+      xmlns:cs="http://www.cellml.org/metadata/simulation/1.0#"
+      xmlns:cg="http://www.cellml.org/metadata/graphs/1.0#">
+    <rdf:Description rdf:about="">
+      <dc:creator rdf:parseType="Resource">
+        <vCard:N rdf:parseType="Resource">
+          <vCard:Family>Nickerson</vCard:Family>
+          <vCard:Given>David</vCard:Given>
+        </vCard:N>
+        <vCard:EMAIL rdf:parseType="Resource">
+          <rdf:value>david.nickerson@nus.edu.sg</rdf:value>
+          <rdf:type rdf:resource="http://imc.org/vCard/3.0#internet" />
+        </vCard:EMAIL>
+        <vCard:ORG rdf:parseType="Resource">
+          <vCard:Orgname>National University of Singapore</vCard:Orgname>
+          <vCard:Orgunit>Division of Bioengineering</vCard:Orgunit>
+        </vCard:ORG>
+      </dc:creator>
+      <dcterms:created rdf:parseType="Resource">
+        <dcterms:W3CDTF>2006-12-21</dcterms:W3CDTF>
+      </dcterms:created>
+    </rdf:Description>
+    <rdf:Description rdf:about="#sin">
+      <dc:title>
+        Simple sine model..
+      </dc:title>
+      <cmeta:comment rdf:parseType="Resource">
+        <rdf:value>
+          A very simple model.
+        </rdf:value>
+        <dc:creator rdf:parseType="Resource">
+          <vCard:FN>David Nickerson</vCard:FN>
+        </dc:creator>
+      </cmeta:comment>
+    </rdf:Description>
+  </rdf:RDF>
+
+  <component name="sin" cmeta:id="sin">
+    <variable name="x" units="dimensionless" public_interface="in" private_interface="out"/>
+    <variable cmeta:id="sin" name="sin" units="dimensionless" public_interface="out" private_interface="out"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply id="actual_sin"><eq/>
+        <ci>sin</ci>
+        <apply><sin/>
+          <ci>x</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  
+</model>
