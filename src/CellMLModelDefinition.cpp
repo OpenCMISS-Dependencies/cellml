@@ -142,7 +142,10 @@ int CellMLModelDefinition::instantiate()
        directory so we can have the compiled object nice and handy to
        delete */
     char templ[64] = "tmp.cellml2code.XXXXXX";
-    mkdtemp(templ);
+    if (mkdtemp(templ))
+		{
+			// FIXME: should check for an error...
+		}
     mTmpDirName = templ;
     mTmpDirExists = true;
     sprintf(templ,"%s/cellml2code.XXXXXX",mTmpDirName.c_str());

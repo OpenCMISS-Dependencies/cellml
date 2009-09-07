@@ -198,7 +198,10 @@ static char* getAbsoluteURI(const char* uri)
       /*printf("URI (%s) is relative path, making absolute URI: ",uri);*/
       int size = pathconf(".",_PC_PATH_MAX);
       char* cwd = (char*)malloc(size);
-      getcwd(cwd,size);
+      if (getcwd(cwd,size))
+			{
+				// FIXME: should check for an error...
+			}
       char* abs = (char*)malloc(strlen(cwd)+strlen(uri)+1+8);
       sprintf(abs,"file://%s/%s",cwd,uri);
       free(cwd);
