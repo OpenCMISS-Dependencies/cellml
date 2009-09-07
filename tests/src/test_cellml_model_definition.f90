@@ -22,20 +22,20 @@ PROGRAM TestCellMLModelDefinition
   REAL (C_DOUBLE), ALLOCATABLE :: ALGEBRAIC(:)
   TYPE (C_FUNPTR) :: SETUP_FIXED_CONSTANTS
 
-  count = NARGS()
-  CALL GETARG(0,buf,status)
+  count = iargc() + 1
+  CALL GET_COMMAND_ARGUMENT(0,buf,status)
   IF (count .lt. 2) THEN
      WRITE(*,*) 'usage: ',buf(1:status),' <uri>'
      STOP 1
   END IF
-  CALL GETARG(1,uri_arg,uriL) ! Should check status/uriL...
+  CALL GET_COMMAND_ARGUMENT(1,uri_arg,uriL) ! Should check status/uriL...
   ! default time data
   times(1) = 0.0_DP !tStart
   times(2) = 1.0_DP !tEnd
   times(3) = 0.1_DP !tabT
   times(4) = 0.01_DP !dt
   DO i=2,count-1
-     CALL GETARG(i,buf)
+     CALL GET_COMMAND_ARGUMENT(i,buf)
      READ(buf,*) times(i-1)
   END DO
   WRITE(*,*) 'Input URI: ',uri_arg(1:uriL)
@@ -98,7 +98,7 @@ PROGRAM TestCellMLModelDefinition
   ALLOCATE(ALGEBRAIC(N_ALGEBRAIC))
   ! initialise
   OPEN(2,FILE='results')
-  VOI = times(0)
+  VOI = times(1)
   CALL CELLML_MODEL_DEFINITION_CALL_SETUP_FIXED_CONSTANTS &
        (CELLML_MODEL,CONSTANTS,RATES,STATES)
   CALL CELLML_MODEL_DEFINITION_CALL_COMPUTE_RATES &
@@ -112,7 +112,7 @@ PROGRAM TestCellMLModelDefinition
   DO ci=1,N_ALGEBRAIC
      WRITE(2,'(a,F12.8)',advance='no') ' ',ALGEBRAIC(ci)
   END DO
-  WRITE(2,'') 
+  WRITE(2,'()') 
   ! basic Euler integration
   DO WHILE (VOI .LT. times(2))
      te = VOI + times(3)
@@ -136,7 +136,7 @@ PROGRAM TestCellMLModelDefinition
      DO ci=1,N_ALGEBRAIC
         WRITE(2,'(F12.8)',advance='no') ALGEBRAIC(ci)
      END DO
-     WRITE(2,'') 
+     WRITE(2,'()') 
      VOI = te
   END DO
   CLOSE(2)
