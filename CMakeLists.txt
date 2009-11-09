@@ -47,3 +47,11 @@ TARGET_LINK_LIBRARIES(test_cellml_model_definition
 )
 ADD_TEST(test_cellml_model_definition test_cellml_model_definition ${CMAKE_SOURCE_DIR}/tests/input/sin_approximations_import-OCD.xml)
 ADD_TEST(check_results diff ${CMAKE_SOURCE_DIR}/tests/input/test_cellml_model_definition_results results)
+
+INSTALL(TARGETS occellml
+	ARCHIVE DESTINATION lib
+)
+
+INSTALL(FILES ${CMAKE_BINARY_DIR}/cellml_model_definition.mod
+	DESTINATION include
+)
