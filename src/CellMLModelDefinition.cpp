@@ -4,8 +4,17 @@
 #include <wchar.h>
 #include <iostream>
 #include <vector>
+#ifdef DYNAMIC_COMPILE
 #include <unistd.h>
 #include <dlfcn.h>
+#endif
+
+#ifdef _MSC_VER
+#	include <direct.h>
+#endif
+
+/* needs to be before CellML headers to avoid conflict with uint32_t in cda_config.h */
+#include "occellml_config.h"
 
 #include <IfaceCellML_APISPEC.hxx>
 #include <IfaceCCGS.hxx>
@@ -132,12 +141,13 @@ int CellMLModelDefinition::instantiate()
   }
   catch (...)
   {
-    std::wcerr << L"Error loading moggdel URL: " << URL.c_str() << std::endl;
+    std::wcerr << L"Error loading model URL: " << URL.c_str() << std::endl;
     return -2;
   }
   std::wstring codeString = getModelAsCCode((void*)model);
   if (codeString.length() > 1)
   {
+#ifdef DYNAMIC_COMPILE
     /* We have code, so dump it out to a temporary file in a temporary
        directory so we can have the compiled object nice and handy to
        delete */
@@ -211,6 +221,9 @@ int CellMLModelDefinition::instantiate()
       std::cerr << "Error compiling the code into a shared object" << std::endl;
       code = -4;
     }
+#else
+	  std::cerr << codeString.c_str() << std::endl;
+#endif
   }
   else
   {
@@ -456,7 +469,7 @@ CellMLModelDefinition::getModelAsCCode(void* _ptr)
 	 */
 	frag = cci->initConstsString();
 	code += L"void SetupFixedConstants(double* CONSTANTS,double* RATES,"
-	  "double* STATES)\n{\n";
+	  L"double* STATES)\n{\n";
 	code += frag;
 	code += L"}\n";
 	free(frag);

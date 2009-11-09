@@ -5,6 +5,8 @@
 
 #include <libxml/xmlreader.h>
 
+#include "occellml_config.h"
+
 #include "SimulationDescription.hpp"
 #include "RDFGraph.hpp"
 #include "namespaces.h"

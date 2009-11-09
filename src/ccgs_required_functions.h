@@ -1,7 +1,6 @@
 #ifndef _CCGS_REQUIRED_FUNCTIONS_H_
 #define _CCGS_REQUIRED_FUNCTIONS_H_
 
-#include <inttypes.h>
 #include <stdarg.h>
 
 #ifdef __cplusplus

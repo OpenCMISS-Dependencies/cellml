@@ -5,9 +5,16 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "occellml_config.h"
+
 #include "CellMLModelDefinitionF.h"
 #include "CellMLModelDefinition.hpp"
 #include "ccgs_required_functions.h"
+
+#ifdef _MSC_VER
+#	include <direct.h>
+#	define getcwd _getcwd
+#endif
 
 static char* getAbsoluteURI(const char* uri);
 
@@ -196,7 +203,12 @@ static char* getAbsoluteURI(const char* uri)
     {
       /* relative filename ? append absoulte path */
       /*printf("URI (%s) is relative path, making absolute URI: ",uri);*/
-      int size = pathconf(".",_PC_PATH_MAX);
+		int size;
+#ifdef WIN32
+		size = _MAX_PATH;
+#else
+		size = pathconf(".",_PC_PATH_MAX);
+#endif
       char* cwd = (char*)malloc(size);
       if (getcwd(cwd,size))
 			{

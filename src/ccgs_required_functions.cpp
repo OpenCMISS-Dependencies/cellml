@@ -3,7 +3,15 @@
 #include <math.h>
 #include <assert.h>
 
+#include "occellml_config.h"
+
 #include "ccgs_required_functions.h"
+
+#ifdef _MSC_VER
+#	include <float.h>
+#	define isfinite _finite
+#	define INFINITY (double)(0x7FF0000000000000L)
+#endif
 
 /* functions all taken from CISSolve.cxx */
 double

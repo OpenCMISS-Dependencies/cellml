@@ -1,6 +1,8 @@
 #include <string>
 #include <iostream>
 
+#include "occellml_config.h"
+
 #include "SimulationDescription.hpp"
 
 bool SimulationDescription::isValid()
