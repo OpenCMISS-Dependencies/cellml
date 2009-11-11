@@ -5,8 +5,8 @@
 #include <iostream>
 #include <vector>
 #ifdef DYNAMIC_COMPILE
-#include <unistd.h>
-#include <dlfcn.h>
+#  include <unistd.h>
+#  include <dlfcn.h>
 #endif
 
 #ifdef _MSC_VER
@@ -223,6 +223,7 @@ int CellMLModelDefinition::instantiate()
     }
 #else
 	  std::cerr << codeString.c_str() << std::endl;
+	  code = 0;
 #endif
   }
   else
@@ -232,7 +233,7 @@ int CellMLModelDefinition::instantiate()
     code = -3;
   }
   model->release_ref();
-  return 0;
+  return code;
 }
 
 /*

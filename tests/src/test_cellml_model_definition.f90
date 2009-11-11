@@ -72,7 +72,7 @@ PROGRAM TestCellMLModelDefinition
   ! instantiate the CellML model
   CODE = CELLML_MODEL_DEFINITION_INSTANTIATE(CELLML_MODEL)
   IF (CODE.NE.0) THEN
-     WRITE(*,*) 'There were errors instantiating the model'
+     WRITE(*,*) 'There were errors instantiating the model: ',CODE
      STOP 5
   END IF
 
