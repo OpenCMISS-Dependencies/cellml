@@ -77,10 +77,10 @@ class CellMLModelDefinition
     return mInstantiated;
   }
 
-  uint32_t nBound;
-  uint32_t nRates;
-  uint32_t nAlgebraic;
-  uint32_t nConstants;
+  int32_t nBound;
+  int32_t nRates;
+  int32_t nAlgebraic;
+  int32_t nConstants;
 
   // loaded from the generated and compiled DSO
   /* Initialise all variables which aren't state variables but have an

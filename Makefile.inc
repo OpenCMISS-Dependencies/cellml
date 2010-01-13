@@ -24,9 +24,9 @@ endif
 
 include $(MAKEINC_ROOT)/Makefile.inc
 
-CDA_DIR = $(CDA_ROOT)/cellml/$(LIB_ARCH_DIR)$(DEBUG_SUFFIX)$(PROF_SUFFIX)$(COMPILER_SUFFIX)
+CDA_DIR = $(CDA_ROOT)/cellml/$(LIB_ARCH_DIR)$(DEBUG_SUFFIX)$(PROF_SUFFIX)/$(COMPILER)
 
-LIBOCCELLML_DIR = $(CURDIR)/$(LIB_ARCH_DIR)$(DEBUG_SUFFIX)$(PROF_SUFFIX)$(COMPILER_SUFFIX)
+LIBOCCELLML_DIR = $(CURDIR)/$(LIB_ARCH_DIR)$(DEBUG_SUFFIX)$(PROF_SUFFIX)/$(COMPILER)
 
 CELLML_LIBRARIES = -loccellml -lcellml -lccgs -lannotools -lcevas -lcuses -lmalaes -lrdf -lraptor -lrasqal -lxml2 -ldl -lstdc++
 

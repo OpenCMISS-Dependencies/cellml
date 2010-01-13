@@ -28,11 +28,53 @@ ifeq ($(OPERATING_SYSTEM),linux)
     CMAKE_ENV += FC=gfortran
     CMAKE_ENV += CC=gcc
     CMAKE_ENV += CXX=g++
-  endif
-  ifeq ($(COMPILER),intel)
-    CMAKE_ENV += FC=ifort
-    CMAKE_ENV += CC=icc
-    CMAKE_ENV += CXX=icc
+    ifeq ($(ABI),32)
+      CMAKE_ENV += CFLAGS="-m32"
+      CMAKE_ENV += CXXFLAGS="-m32"
+      CMAKE_ENV += FFLAGS="-m32"
+      CMAKE_ENV += LDFLAGS="-m32"
+    else
+      CMAKE_ENV += CFLAGS="-m64"
+      CMAKE_ENV += CXXFLAGS="-m64"
+      CMAKE_ENV += FFLAGS="-m64"
+      CMAKE_ENV += LDFLAGS="-m64"
+    endif
+  else
+    ifeq ($(COMPILER),ibm)
+      CMAKE_ENV += FC=xlf90_r
+      CMAKE_ENV += CC=xlc_r
+      CMAKE_ENV += CXX=xlC_r
+      ifeq ($(ABI),32)
+        CMAKE_ENV += CFLAGS="-q32"
+        CMAKE_ENV += CXXFLAGS="-q32"
+        CMAKE_ENV += FFLAGS="-q32"
+        CMAKE_ENV += LDFLAGS="-q32"
+      else
+        CMAKE_ENV += CFLAGS="-q64"
+        CMAKE_ENV += CXXFLAGS="-q64"
+        CMAKE_ENV += FFLAGS="-q64"
+        CMAKE_ENV += LDFLAGS="-q64"
+      endif
+    else
+      ifeq ($(COMPILER),intel)
+        CMAKE_ENV += FC=ifort
+        CMAKE_ENV += CC=icc
+        CMAKE_ENV += CXX=icpc
+        ifeq ($(ABI),32)
+          CMAKE_ENV += CFLAGS="-m32"
+          CMAKE_ENV += CXXFLAGS="-m32"
+          CMAKE_ENV += FFLAGS="-m32"
+          CMAKE_ENV += LDFLAGS="-m32"
+        else
+          CMAKE_ENV += CFLAGS="-m64"
+          CMAKE_ENV += CXXFLAGS="-m64"
+          CMAKE_ENV += FFLAGS="-m64"
+          CMAKE_ENV += LDFLAGS="-m64"
+        endif
+       else
+        $(error invalid COMPILER specification)
+      endif
+    endif
   endif
   occellml_build = occellml_build_linux
 endif
