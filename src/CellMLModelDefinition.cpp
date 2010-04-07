@@ -4,6 +4,7 @@
 #include <wchar.h>
 #include <iostream>
 #include <vector>
+#include <stdio.h>
 #ifdef DYNAMIC_COMPILE
 #  include <unistd.h>
 #  include <dlfcn.h>
@@ -24,8 +25,6 @@
 #include <CellMLBootstrap.hpp>
 
 #include "CellMLModelDefinition.hpp"
-#include "SimulationDescription.hpp"
-#include "RDFGraph.hpp"
 #include "utils.hxx"
 
 /*
@@ -43,7 +42,9 @@ static std::wstring formatNumber(const uint32_t value)
   swprintf(valueString,100,L"%u",value);
   return std::wstring(valueString);
 }*/
+#if 0
 static char* getURIFromURIWithFragmentID(const char* uri);
+#endif
 //static char* wstring2string(const wchar_t* str);
 static wchar_t* string2wstring(const char* str);
 
@@ -61,7 +62,8 @@ CellMLModelDefinition::CellMLModelDefinition()
   nConstants = -1;
 }
 
-CellMLModelDefinition::CellMLModelDefinition(const char* url)
+CellMLModelDefinition::CellMLModelDefinition(const char* url) :
+		mURL(url)
 {
   mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
   mTmpDirExists = false;
@@ -75,18 +77,10 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url)
   nConstants = -1;
   std::cout << "Creating CellMLModelDefinition from the URL: " 
 	    << url << std::endl;
-  // first need to create a RDF graph of the data in the source document
-  RDFGraph* rdfGraph = new RDFGraph();
-  rdfGraph->buildFromURL(url);
-  //rdfGraph->print(stdout);
-  // can we find a valid simulation in the model defintion graph?
-  mSimulationDescription = rdfGraph->createSimulationDescription();
-  delete rdfGraph;
-  if (mSimulationDescription && mSimulationDescription->isValid())
+  if (! mURL.empty())
   {
     std::cout << "Have a valid simulation description." << std::endl;
-    std::cout << "  CellML model URI: " << mSimulationDescription->modelURI() 
-	      << std::endl;
+    std::cout << "  CellML model URI: " << mURL.c_str() << std::endl;
   }
 }
 
@@ -96,7 +90,7 @@ CellMLModelDefinition::~CellMLModelDefinition()
   if (mSaveTempFiles)
   {
     std::cout << "At users request, leaving generated files for model: "
-	      << mSimulationDescription->modelURI() << std::endl;
+	      << mURL.c_str() << std::endl;
   }
   if (mCodeFileExists)
   {
@@ -116,21 +110,18 @@ CellMLModelDefinition::~CellMLModelDefinition()
     else std::cout << "Leaving generated temporary directory: "
 		   << mTmpDirName.c_str() << std::endl;
   }
-  if (mSimulationDescription) delete mSimulationDescription;
 }
 
 int CellMLModelDefinition::instantiate()
 {
   int code = -1;
-  if (!mSimulationDescription->isValid())
+  if (mURL.empty())
   {
     std::cerr << "CellMLModelDefinition::instantiate -- "
-	      << "invalid simulation description." << std::endl;
+	      << "invalid model URL." << std::endl;
     return -1;
   }
-  RETURN_INTO_STRING(url,
-    getURIFromURIWithFragmentID(mSimulationDescription->modelURI()));
-  RETURN_INTO_WSTRING(URL,string2wstring(url.c_str()));
+  RETURN_INTO_WSTRING(URL,string2wstring(mURL.c_str()));
   RETURN_INTO_OBJREF(cb,iface::cellml_api::CellMLBootstrap,
     CreateCellMLBootstrap());
   RETURN_INTO_OBJREF(ml,iface::cellml_api::ModelLoader,cb->modelLoader());
@@ -154,7 +145,7 @@ int CellMLModelDefinition::instantiate()
     char templ[64] = "tmp.cellml2code.XXXXXX";
     if (mkdtemp(templ))
 		{
-			// FIXME: should check for an error...
+			// \todo should check for an error...
 		}
     mTmpDirName = templ;
     mTmpDirExists = true;
@@ -239,6 +230,7 @@ int CellMLModelDefinition::instantiate()
 /*
  * Local methods
  */
+#if 0
 // Bit of a hack, but will do the job until the full URI functionality in the current trunk CellML API makes it into a release - or could look at using the xmlURIPtr that comes with libxml2...
 static char* getURIFromURIWithFragmentID(const char* uri)
 {
@@ -262,6 +254,7 @@ static char* getURIFromURIWithFragmentID(const char* uri)
   }
   return(u);
 }
+#endif
 
 /*char* wstring2string(const wchar_t* str)
 {

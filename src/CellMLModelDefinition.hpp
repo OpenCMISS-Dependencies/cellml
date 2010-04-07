@@ -103,10 +103,10 @@ class CellMLModelDefinition
   /**
    * Generate C code for the given CellML model.
    * @param model The CellML model for which to generate C code.
-   * @return The generated code, if successfull; and empty string otherwise.
+   * @return The generated code, if successful; and empty string otherwise.
    */
   std::wstring getModelAsCCode(void* model);
-  class SimulationDescription* mSimulationDescription;
+  std::string mURL;
   std::string mTmpDirName;
   bool mTmpDirExists;
   std::string mCodeFileName;

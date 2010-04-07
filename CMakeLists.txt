@@ -10,7 +10,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${liboccellml_SOURCE_DIR})
 
 FIND_PACKAGE(CellML REQUIRED)
 FIND_PACKAGE(CCGS REQUIRED)
-FIND_PACKAGE(Redland REQUIRED)
 FIND_PACKAGE(LibXml2 REQUIRED QUIET)
 
 # Probably better to not do this as it probably overrides and external value?
@@ -19,7 +18,7 @@ IF( MSVC )
 ELSE (MSVC )
     # allow dynamic compilation
     ADD_DEFINITIONS(-DDYNAMIC_COMPILE)
-    SET (CMAKE_CXX_FLAGS "-Wall -Werror ${LIBXML2_DEFINITIONS} ${Redland_DEFINITIONS}")
+    SET (CMAKE_CXX_FLAGS "-Wall -Werror ${LIBXML2_DEFINITIONS}")
 ENDIF( MSVC )
 
 INCLUDE_DIRECTORIES(
@@ -31,8 +30,6 @@ INCLUDE_DIRECTORIES(
 SET(liboccellml_SRCS
   src/CellMLModelDefinitionF.cpp
   src/CellMLModelDefinition.cpp
-  src/RDFGraph.cpp
-  src/SimulationDescription.cpp
   src/ccgs_required_functions.cpp
 )
 
@@ -48,7 +45,6 @@ TARGET_LINK_LIBRARIES(test_cellml_model_definition
     cellml_model_definition
     ${CELLML_LIBRARIES}
     ${CCGS_LIBRARIES}
-    ${Redland_LIBRARIES}
     ${LIBXML2_LIBRARIES}
     -ldl -lm
 #    -lstdc++
