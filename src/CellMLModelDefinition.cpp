@@ -81,11 +81,32 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   {
     std::cout << "Have a valid simulation description." << std::endl;
     std::cout << "  CellML model URI: " << mURL.c_str() << std::endl;
+
+    RETURN_INTO_WSTRING(URL,string2wstring(mURL.c_str()));
+    RETURN_INTO_OBJREF(cb,iface::cellml_api::CellMLBootstrap,
+      CreateCellMLBootstrap());
+    RETURN_INTO_OBJREF(ml,iface::cellml_api::ModelLoader,cb->modelLoader());
+    iface::cellml_api::Model* model = (iface::cellml_api::Model*)NULL;
+    try
+    {
+      model = ml->loadFromURL(URL.c_str());
+      mModel = static_cast<void*>(model);
+    }
+    catch (...)
+    {
+      std::wcerr << L"Error loading model URL: " << URL.c_str() << std::endl;
+      mModel = static_cast<void*>(NULL);
+    }
   }
 }
 
 CellMLModelDefinition::~CellMLModelDefinition()
 {
+  if (mModel)
+  {
+    iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
+    model->release_ref();
+  }
   // delete temporary files
   if (mSaveTempFiles)
   {
@@ -110,6 +131,20 @@ CellMLModelDefinition::~CellMLModelDefinition()
     else std::cout << "Leaving generated temporary directory: "
 		   << mTmpDirName.c_str() << std::endl;
   }
+}
+
+int CellMLModelDefinition::addMappingToField(const char* name)
+{
+  if (! mModel)
+  {
+    std::cerr << "CellMLModelDefinition::addMappingToField -- missing model?" << std::endl;
+    return -1;
+  }
+  // check a CeVAS exists for this model
+  // find named variable - in local components only!
+  // check if source variable already mapped to a field, if yes return its index
+  // if not, add source variable to mapping vector and return its index
+  return 321;
 }
 
 int CellMLModelDefinition::instantiate()

@@ -29,6 +29,19 @@ class CellMLModelDefinition
   ~CellMLModelDefinition();
 
   /**
+   * Annotate the model definition with the information that the named variable will be mapped to an
+   * OpenCMISS field variable component. We need to know this information when it comes time to instantiate
+   * the model into procedural code. Currently only the top level model is searched for the named variable,
+   * but this may change in the future. We also need to ensure that a given source variable is only mapped once,
+   * hence we return an index to the mapping for the named variable. This index may already exist if the source
+   * variable has already been mapped - this is not an error as the value of this variable can be used in multiple
+   * field variable components.
+   * @param name The name of the model variable to map.
+   * @return If sucessful, the index of this mapping; -1 otherwise.
+   */
+  int addMappingToField(const char* name);
+
+  /**
    * Instantiate the model definition into simulat-able code.
    * @return 0 if success; non-zero otherwise.
    */
@@ -117,6 +130,7 @@ class CellMLModelDefinition
   bool mSaveTempFiles;
   void* mHandle;
   bool mInstantiated;
+  void* mModel;
 };
 
 #endif // _CELLMLMODELDEFINITION_H_

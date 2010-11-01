@@ -20,6 +20,20 @@ extern "C"
   void destroy_cellml_model_definition_f(void** model);
 
   /**
+   * Annotate the model definition with the information that the named variable will be mapped to an
+   * OpenCMISS field variable component. We need to know this information when it comes time to instantiate
+   * the model into procedural code. Currently only the top level model is searched for the named variable,
+   * but this may change in the future. We also need to ensure that a given source variable is only mapped once,
+   * hence we return an index to the mapping for the named variable. This index may already exist if the source
+   * variable has already been mapped - this is not an error as the value of this variable can be used in multiple
+   * field variable components.
+   * @param model An existing CellML model definition object.
+   * @param name NULL-terminated string containing the name of the model variable to map.
+   * @return If sucessful, the index of this mapping; -1 otherwise.
+   */
+  int cellml_model_definition_add_mapping_to_field_f(void* model,const char* name);
+
+  /**
    * Set the save temporary files flag.
    * @param model The CellML model definition to use.
    * @param state Should be set to non-zero to save generated temporary files.

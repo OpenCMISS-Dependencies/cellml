@@ -60,6 +60,21 @@ void destroy_cellml_model_definition_f(void** _ptr)
   }
 }
 
+int cellml_model_definition_add_mapping_to_field_f(void* _ptr,const char* name)
+{
+  CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
+  if (_ptr && (def = (CellMLModelDefinition*)_ptr))
+  {
+    return def->addMappingToField(name);
+  }
+  else
+  {
+    std::cerr << "[cellml_model_definition_add_mapping_to_field_f] "
+        << "Invalid arguments." << std::endl;
+  }
+  return -1;
+}
+
 void cellml_model_definition_set_save_temp_files_f(void* _ptr,int state)
 {
   CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
