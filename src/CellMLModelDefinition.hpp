@@ -29,17 +29,18 @@ class CellMLModelDefinition
   ~CellMLModelDefinition();
 
   /**
-   * Annotate the model definition with the information that the named variable will be mapped to an
-   * OpenCMISS field variable component. We need to know this information when it comes time to instantiate
-   * the model into procedural code. Currently only the top level model is searched for the named variable,
-   * but this may change in the future. We also need to ensure that a given source variable is only mapped once,
-   * hence we return an index to the mapping for the named variable. This index may already exist if the source
-   * variable has already been mapped - this is not an error as the value of this variable can be used in multiple
-   * field variable components.
-   * @param name The name of the model variable to map.
-   * @return If sucessful, the index of this mapping; -1 otherwise.
+   * Flag the specified variable as being 'known' for the purposes of code generation. This implies
+   * that the variable will have its value set externally to the CellML model.
+   * @param name The name of the model variable to flag. This string should be in the format of 'component_name/variable_name'.
    */
-  int addMappingToField(const char* name);
+  void setVariableAsKnown(const char* name);
+
+  /**
+   * Flag the specified variable as being 'wanted' for the purposes of code generation. This implies
+   * that the variable will have its value used externally to the CellML model.
+   * @param name The name of the model variable to flag. This string should be in the format of 'component_name/variable_name'.
+   */
+  void setVariableAsWanted(const char* name);
 
   /**
    * Instantiate the model definition into simulat-able code.

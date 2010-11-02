@@ -133,18 +133,30 @@ CellMLModelDefinition::~CellMLModelDefinition()
   }
 }
 
-int CellMLModelDefinition::addMappingToField(const char* name)
+void CellMLModelDefinition::setVariableAsKnown(const char* name)
 {
   if (! mModel)
   {
-    std::cerr << "CellMLModelDefinition::addMappingToField -- missing model?" << std::endl;
-    return -1;
+    std::cerr << "CellMLModelDefinition::setVariableAsKnown -- missing model?" << std::endl;
+    return;
   }
   // check a CeVAS exists for this model
   // find named variable - in local components only!
   // check if source variable already mapped to a field, if yes return its index
   // if not, add source variable to mapping vector and return its index
-  return 321;
+}
+
+void CellMLModelDefinition::setVariableAsWanted(const char* name)
+{
+  if (! mModel)
+  {
+    std::cerr << "CellMLModelDefinition::setVariableAsWanted-- missing model?" << std::endl;
+    return;
+  }
+  // check a CeVAS exists for this model
+  // find named variable - in local components only!
+  // check if source variable already mapped to a field, if yes return its index
+  // if not, add source variable to mapping vector and return its index
 }
 
 int CellMLModelDefinition::instantiate()

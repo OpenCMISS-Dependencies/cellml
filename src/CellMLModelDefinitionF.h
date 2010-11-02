@@ -20,18 +20,22 @@ extern "C"
   void destroy_cellml_model_definition_f(void** model);
 
   /**
-   * Annotate the model definition with the information that the named variable will be mapped to an
-   * OpenCMISS field variable component. We need to know this information when it comes time to instantiate
-   * the model into procedural code. Currently only the top level model is searched for the named variable,
-   * but this may change in the future. We also need to ensure that a given source variable is only mapped once,
-   * hence we return an index to the mapping for the named variable. This index may already exist if the source
-   * variable has already been mapped - this is not an error as the value of this variable can be used in multiple
-   * field variable components.
+   * Flag the specified variable as being 'known' for the purposes of code generation. This implies
+   * that the variable will have its value set externally to the CellML model.
    * @param model An existing CellML model definition object.
-   * @param name NULL-terminated string containing the name of the model variable to map.
-   * @return If sucessful, the index of this mapping; -1 otherwise.
+   * @param name NULL-terminated string containing the name of the model variable to flag. This string
+   * should be in the format of 'component_name/variable_name'.
    */
-  int cellml_model_definition_add_mapping_to_field_f(void* model,const char* name);
+  void cellml_model_definition_set_variable_as_known_f(void* model,const char* name);
+
+  /**
+   * Flag the specified variable as being 'wanted' for the purposes of code generation. This implies
+   * that the variable will have its value used externally to the CellML model.
+   * @param model An existing CellML model definition object.
+   * @param name NULL-terminated string containing the name of the model variable to flag. This string
+   * should be in the format of 'component_name/variable_name'.
+   */
+  void cellml_model_definition_set_variable_as_wanted_f(void* model,const char* name);
 
   /**
    * Set the save temporary files flag.
