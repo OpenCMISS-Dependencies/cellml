@@ -23,6 +23,8 @@
 #include <MaLaESBootstrap.hpp>
 #include <CCGSBootstrap.hpp>
 #include <CellMLBootstrap.hpp>
+#include <IfaceAnnoTools.hxx>
+#include <AnnoToolsBootstrap.hpp>
 
 #include "CellMLModelDefinition.hpp"
 #include "utils.hxx"
@@ -30,6 +32,9 @@
 /*
  * Prototype local methods
  */
+typedef std::pair<std::string,std::string> CVpair;
+static CVpair splitName(const char* s);
+
 /*static std::wstring formatNumber(const int value)
 {
   wchar_t valueString[100];
@@ -60,6 +65,9 @@ CellMLModelDefinition::CellMLModelDefinition()
   nRates = -1;
   nAlgebraic = -1;
   nConstants = -1;
+  mModel = NULL;
+  mCodeInformation = NULL;
+  mAnnotations = NULL;
 }
 
 CellMLModelDefinition::CellMLModelDefinition(const char* url) :
@@ -75,13 +83,15 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   nRates = -1;
   nAlgebraic = -1;
   nConstants = -1;
+  mModel = NULL;
+  mCodeInformation = NULL;
+  mAnnotations = NULL;
   std::cout << "Creating CellMLModelDefinition from the URL: " 
 	    << url << std::endl;
   if (! mURL.empty())
   {
-    std::cout << "Have a valid simulation description." << std::endl;
-    std::cout << "  CellML model URI: " << mURL.c_str() << std::endl;
-
+    //std::cout << "Have a valid simulation description." << std::endl;
+    //std::cout << "  CellML model URI: " << mURL.c_str() << std::endl;
     RETURN_INTO_WSTRING(URL,string2wstring(mURL.c_str()));
     RETURN_INTO_OBJREF(cb,iface::cellml_api::CellMLBootstrap,
       CreateCellMLBootstrap());
@@ -90,7 +100,26 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
     try
     {
       model = ml->loadFromURL(URL.c_str());
+      model->fullyInstantiateImports();
       mModel = static_cast<void*>(model);
+      // make sure we can generate code and get the initial code information
+      RETURN_INTO_OBJREF(cgb,iface::cellml_services::CodeGeneratorBootstrap,
+        CreateCodeGeneratorBootstrap());
+      RETURN_INTO_OBJREF(cg,iface::cellml_services::CodeGenerator,
+        cgb->createCodeGenerator());
+      try
+      {
+        RETURN_INTO_OBJREF(cci,iface::cellml_services::CodeInformation,
+          cg->generateCode(model));
+        // need to keep a handle on the code information
+        cci->add_ref();
+        mCodeInformation = static_cast<void*>(cci);
+      }
+      catch (...)
+      {
+        std::wcerr << L"Error generating the code information for the model" << std::endl;
+        mCodeInformation = static_cast<void*>(NULL);
+      }
     }
     catch (...)
     {
@@ -102,6 +131,16 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
 
 CellMLModelDefinition::~CellMLModelDefinition()
 {
+  if (mAnnotations)
+  {
+    iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(mAnnotations);
+    as->release_ref();
+  }
+  if (mCodeInformation)
+  {
+    iface::cellml_services::CodeInformation* cci = static_cast<iface::cellml_services::CodeInformation*>(mCodeInformation);
+    cci->release_ref();
+  }
   if (mModel)
   {
     iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
@@ -133,30 +172,139 @@ CellMLModelDefinition::~CellMLModelDefinition()
   }
 }
 
-void CellMLModelDefinition::setVariableAsKnown(const char* name)
+static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t* typeString,
+    std::vector<iface::cellml_services::VariableEvaluationType> vets)
 {
-  if (! mModel)
+  if (! d->mCodeInformation)
   {
-    std::cerr << "CellMLModelDefinition::setVariableAsKnown -- missing model?" << std::endl;
-    return;
+    std::cerr << "CellMLModelDefinition::flagVariable -- missing model?" << std::endl;
+    return -1;
   }
-  // check a CeVAS exists for this model
+  CVpair cv = splitName(name);
+  //std::cout << "setting variable '" << cv.second.c_str() << "' from component '" << cv.first.c_str() << "' as KNOWN" << std::endl;
+  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(d->mModel);
+  iface::cellml_services::CodeInformation* cci= static_cast<iface::cellml_services::CodeInformation*>(d->mCodeInformation);
+  iface::cellml_services::AnnotationSet* as = NULL;
+  if (d->mAnnotations == NULL)
+  {
+    RETURN_INTO_OBJREF(ats,iface::cellml_services::AnnotationToolService,CreateAnnotationToolService());
+    as = ats->createAnnotationSet();
+    d->mAnnotations = static_cast<void*>(as);
+  }
+  else
+  {
+    as = static_cast<iface::cellml_services::AnnotationSet*>(d->mAnnotations);
+  }
   // find named variable - in local components only!
-  // check if source variable already mapped to a field, if yes return its index
-  // if not, add source variable to mapping vector and return its index
+  RETURN_INTO_OBJREF(components,iface::cellml_api::CellMLComponentSet,model->localComponents());
+  RETURN_INTO_WSTRING(cname,string2wstring(cv.first.c_str()));
+  RETURN_INTO_OBJREF(component,iface::cellml_api::CellMLComponent,components->getComponent(cname.c_str()));
+  if (!component)
+  {
+    std::cerr << "CellMLModelDefinition::flagVariable -- unable to find component: " << cv.first.c_str() << std::endl;
+    return -2;
+  }
+  RETURN_INTO_OBJREF(variables,iface::cellml_api::CellMLVariableSet,component->variables());
+  RETURN_INTO_WSTRING(vname,string2wstring(cv.second.c_str()));
+  RETURN_INTO_OBJREF(variable,iface::cellml_api::CellMLVariable,variables->getVariable(vname.c_str()));
+  if (!variable)
+  {
+    std::cerr << "CellMLModelDefinition::flagVariable -- unable to find variable: " << cv.first.c_str() << " / "
+        << cv.second.c_str() << std::endl;
+    return -3;
+  }
+  // get source variable
+  RETURN_INTO_OBJREF(sv,iface::cellml_api::CellMLVariable,variable->sourceVariable());
+  if (!sv)
+  {
+    std::cerr << "CellMLModelDefinition::flagVariable -- unable get source variable for variable: "
+        << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
+    return -4;
+  }
+  // check if source is already marked as known - what to do? safe to continue with no error
+  RETURN_INTO_WSTRING(currentAnnotation,as->getStringAnnotation(sv,L"flag"));
+  if (!currentAnnotation.empty())
+  {
+    if (currentAnnotation == typeString)
+    {
+      std::cout << "Already flagged same type, nothing to do." << std::endl;
+      return 0;
+    }
+    else
+    {
+      std::cerr << "CellMLModelDefinition::flagVariable -- variable already flagged something else: "
+          << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
+      return -5;
+    }
+  }
+  // find corresponding computation target
+  RETURN_INTO_OBJREF(cti,iface::cellml_services::ComputationTargetIterator,cci->iterateTargets());
+  iface::cellml_services::ComputationTarget* ct = NULL;
+  while(1)
+  {
+    ct = cti->nextComputationTarget();
+    if (ct == NULL) break;
+    if (ct->variable() == sv)
+    {
+//      std::cout << "found a computation target for the source variable of the variable: "
+//          << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
+      break;
+    }
+    else
+    {
+      ct->release_ref();
+      ct = NULL;
+    }
+  }
+  if (!ct)
+  {
+    std::cerr << "CellMLModelDefinition::flagVariable -- unable get computation target for the source of variable: "
+        << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
+    return -5;
+  }
+
+  // check type of computation target and make sure compatible
+  unsigned int i,compatible = 0;
+  for (i=0;i<vets.size();i++)
+  {
+    if (ct->type() == vets[i])
+    {
+      compatible = 1;
+      break;
+    }
+  }
+  if (compatible)
+  {
+    as->setStringAnnotation(sv,L"flag",typeString);
+  }
+  else
+  {
+    std::cerr << "CellMLModelDefinition::flagVariable -- computation target for variable: "
+        << cv.first.c_str() << " / " << cv.second.c_str() << "; is the wrong type to be flagged" << std::endl;
+    ct->release_ref();
+    return -5;
+  }
+  ct->release_ref();
+  return 0;
 }
 
-void CellMLModelDefinition::setVariableAsWanted(const char* name)
+int CellMLModelDefinition::setVariableAsKnown(const char* name)
 {
-  if (! mModel)
-  {
-    std::cerr << "CellMLModelDefinition::setVariableAsWanted-- missing model?" << std::endl;
-    return;
-  }
-  // check a CeVAS exists for this model
-  // find named variable - in local components only!
-  // check if source variable already mapped to a field, if yes return its index
-  // if not, add source variable to mapping vector and return its index
+  std::vector<iface::cellml_services::VariableEvaluationType> vets;
+  vets.push_back(iface::cellml_services::CONSTANT);
+  vets.push_back(iface::cellml_services::VARIABLE_OF_INTEGRATION);
+  vets.push_back(iface::cellml_services::FLOATING);
+  return flagVariable(this,name,L"KNOWN",vets);
+}
+
+int CellMLModelDefinition::setVariableAsWanted(const char* name)
+{
+  std::vector<iface::cellml_services::VariableEvaluationType> vets;
+  vets.push_back(iface::cellml_services::STATE_VARIABLE);
+  vets.push_back(iface::cellml_services::PSEUDOSTATE_VARIABLE);
+  vets.push_back(iface::cellml_services::ALGEBRAIC);
+  vets.push_back(iface::cellml_services::LOCALLY_BOUND);
+  return flagVariable(this,name,L"WANTED",vets);
 }
 
 int CellMLModelDefinition::instantiate()
@@ -277,6 +425,24 @@ int CellMLModelDefinition::instantiate()
 /*
  * Local methods
  */
+static CVpair splitName(const char* s)
+{
+  CVpair p;
+  p.first = std::string();
+  p.second = std::string();
+  if (s)
+  {
+    const char* separator = strchr(s,'/');
+    if (separator)
+    {
+      int l1 = strlen(s) - strlen(separator);
+      p.first = std::string(s,l1);
+      p.second = std::string(++separator);
+    }
+  }
+  return p;
+}
+
 #if 0
 // Bit of a hack, but will do the job until the full URI functionality in the current trunk CellML API makes it into a release - or could look at using the xmlURIPtr that comes with libxml2...
 static char* getURIFromURIWithFragmentID(const char* uri)

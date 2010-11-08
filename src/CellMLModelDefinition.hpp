@@ -32,15 +32,17 @@ class CellMLModelDefinition
    * Flag the specified variable as being 'known' for the purposes of code generation. This implies
    * that the variable will have its value set externally to the CellML model.
    * @param name The name of the model variable to flag. This string should be in the format of 'component_name/variable_name'.
+   * @return 0 if no error, non-zero otherwise.
    */
-  void setVariableAsKnown(const char* name);
+  int setVariableAsKnown(const char* name);
 
   /**
    * Flag the specified variable as being 'wanted' for the purposes of code generation. This implies
    * that the variable will have its value used externally to the CellML model.
    * @param name The name of the model variable to flag. This string should be in the format of 'component_name/variable_name'.
+   * @return 0 if no error, non-zero otherwise.
    */
-  void setVariableAsWanted(const char* name);
+  int setVariableAsWanted(const char* name);
 
   /**
    * Instantiate the model definition into simulat-able code.
@@ -131,7 +133,12 @@ class CellMLModelDefinition
   bool mSaveTempFiles;
   void* mHandle;
   bool mInstantiated;
+
+  // need to access these?
+ public:
   void* mModel;
+  void* mCodeInformation;
+  void* mAnnotations;
 };
 
 #endif // _CELLMLMODELDEFINITION_H_

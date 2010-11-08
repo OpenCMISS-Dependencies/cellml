@@ -60,32 +60,36 @@ void destroy_cellml_model_definition_f(void** _ptr)
   }
 }
 
-void cellml_model_definition_set_variable_as_known_f(void* _ptr,const char* name)
+int cellml_model_definition_set_variable_as_known_f(void* _ptr,const char* name)
 {
+  int return_code = -1;
   CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
   if (_ptr && (def = (CellMLModelDefinition*)_ptr))
   {
-    def->setVariableAsKnown(name);
+    return_code = def->setVariableAsKnown(name);
   }
   else
   {
     std::cerr << "[cellml_model_definition_set_variable_as_known_f] "
         << "Invalid arguments." << std::endl;
   }
+  return return_code;
 }
 
-void cellml_model_definition_set_variable_as_wanted_f(void* _ptr,const char* name)
+int cellml_model_definition_set_variable_as_wanted_f(void* _ptr,const char* name)
 {
+  int return_code = -1;
   CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
   if (_ptr && (def = (CellMLModelDefinition*)_ptr))
   {
-    def->setVariableAsWanted(name);
+    return_code = def->setVariableAsWanted(name);
   }
   else
   {
     std::cerr << "[cellml_model_definition_set_variable_as_wanted_f] "
         << "Invalid arguments." << std::endl;
   }
+  return return_code;
 }
 
 void cellml_model_definition_set_save_temp_files_f(void* _ptr,int state)

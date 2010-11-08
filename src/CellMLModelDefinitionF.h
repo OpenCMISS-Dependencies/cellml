@@ -25,8 +25,9 @@ extern "C"
    * @param model An existing CellML model definition object.
    * @param name NULL-terminated string containing the name of the model variable to flag. This string
    * should be in the format of 'component_name/variable_name'.
+   * @return 0 if no error, non-zero otherwise.
    */
-  void cellml_model_definition_set_variable_as_known_f(void* model,const char* name);
+  int cellml_model_definition_set_variable_as_known_f(void* model,const char* name);
 
   /**
    * Flag the specified variable as being 'wanted' for the purposes of code generation. This implies
@@ -34,8 +35,9 @@ extern "C"
    * @param model An existing CellML model definition object.
    * @param name NULL-terminated string containing the name of the model variable to flag. This string
    * should be in the format of 'component_name/variable_name'.
+   * @return 0 if no error, non-zero otherwise.
    */
-  void cellml_model_definition_set_variable_as_wanted_f(void* model,const char* name);
+  int cellml_model_definition_set_variable_as_wanted_f(void* model,const char* name);
 
   /**
    * Set the save temporary files flag.
