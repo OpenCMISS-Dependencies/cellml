@@ -65,6 +65,8 @@ CellMLModelDefinition::CellMLModelDefinition()
   nRates = -1;
   nAlgebraic = -1;
   nConstants = -1;
+  mNumberOfWantedVariables = 0;
+  mNumberOfKnownVariables = 0;
   mModel = NULL;
   mCodeInformation = NULL;
   mAnnotations = NULL;
@@ -83,6 +85,8 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   nRates = -1;
   nAlgebraic = -1;
   nConstants = -1;
+  mNumberOfWantedVariables = 0;
+  mNumberOfKnownVariables = 0;
   mModel = NULL;
   mCodeInformation = NULL;
   mAnnotations = NULL;
@@ -102,6 +106,10 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
       model = ml->loadFromURL(URL.c_str());
       model->fullyInstantiateImports();
       mModel = static_cast<void*>(model);
+      // create the annotation set
+      RETURN_INTO_OBJREF(ats,iface::cellml_services::AnnotationToolService,CreateAnnotationToolService());
+      iface::cellml_services::AnnotationSet* as = ats->createAnnotationSet();
+      mAnnotations = static_cast<void*>(as);
       // make sure we can generate code and get the initial code information
       RETURN_INTO_OBJREF(cgb,iface::cellml_services::CodeGeneratorBootstrap,
         CreateCodeGeneratorBootstrap());
@@ -114,6 +122,23 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
         // need to keep a handle on the code information
         cci->add_ref();
         mCodeInformation = static_cast<void*>(cci);
+        // and add all state variables as wanted and the variable of integration as known
+        RETURN_INTO_OBJREF(cti,iface::cellml_services::ComputationTargetIterator,cci->iterateTargets());
+        while(1)
+        {
+          RETURN_INTO_OBJREF(ct,iface::cellml_services::ComputationTarget,cti->nextComputationTarget());
+          if (ct == NULL) break;
+          if (ct->type() == iface::cellml_services::STATE_VARIABLE)
+          {
+            as->setStringAnnotation(ct->variable(),L"flag",L"WANTED");
+            mNumberOfWantedVariables++;
+          }
+          else if (ct->type() == iface::cellml_services::VARIABLE_OF_INTEGRATION)
+          {
+            as->setStringAnnotation(ct->variable(),L"flag",L"KNOWN");
+            mNumberOfKnownVariables++;
+          }
+        }
       }
       catch (...)
       {
@@ -184,17 +209,7 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
   //std::cout << "setting variable '" << cv.second.c_str() << "' from component '" << cv.first.c_str() << "' as KNOWN" << std::endl;
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(d->mModel);
   iface::cellml_services::CodeInformation* cci= static_cast<iface::cellml_services::CodeInformation*>(d->mCodeInformation);
-  iface::cellml_services::AnnotationSet* as = NULL;
-  if (d->mAnnotations == NULL)
-  {
-    RETURN_INTO_OBJREF(ats,iface::cellml_services::AnnotationToolService,CreateAnnotationToolService());
-    as = ats->createAnnotationSet();
-    d->mAnnotations = static_cast<void*>(as);
-  }
-  else
-  {
-    as = static_cast<iface::cellml_services::AnnotationSet*>(d->mAnnotations);
-  }
+  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(d->mAnnotations);
   // find named variable - in local components only!
   RETURN_INTO_OBJREF(components,iface::cellml_api::CellMLComponentSet,model->localComponents());
   RETURN_INTO_WSTRING(cname,string2wstring(cv.first.c_str()));
@@ -232,7 +247,7 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
     }
     else
     {
-      std::cerr << "CellMLModelDefinition::flagVariable -- variable already flagged something else: "
+      std::cerr << "CellMLModelDefinition::flagVariacompname, cv->componentName()ble -- variable already flagged something else: "
           << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
       return -5;
     }
@@ -294,7 +309,9 @@ int CellMLModelDefinition::setVariableAsKnown(const char* name)
   vets.push_back(iface::cellml_services::CONSTANT);
   vets.push_back(iface::cellml_services::VARIABLE_OF_INTEGRATION);
   vets.push_back(iface::cellml_services::FLOATING);
-  return flagVariable(this,name,L"KNOWN",vets);
+  int code = flagVariable(this,name,L"KNOWN",vets);
+  if (code == 0) mNumberOfKnownVariables++;
+  return code;
 }
 
 int CellMLModelDefinition::setVariableAsWanted(const char* name)
@@ -304,33 +321,15 @@ int CellMLModelDefinition::setVariableAsWanted(const char* name)
   vets.push_back(iface::cellml_services::PSEUDOSTATE_VARIABLE);
   vets.push_back(iface::cellml_services::ALGEBRAIC);
   vets.push_back(iface::cellml_services::LOCALLY_BOUND);
-  return flagVariable(this,name,L"WANTED",vets);
+  int code = flagVariable(this,name,L"WANTED",vets);
+  if (code == 0) mNumberOfWantedVariables++;
+  return code;
 }
 
 int CellMLModelDefinition::instantiate()
 {
   int code = -1;
-  if (mURL.empty())
-  {
-    std::cerr << "CellMLModelDefinition::instantiate -- "
-	      << "invalid model URL." << std::endl;
-    return -1;
-  }
-  RETURN_INTO_WSTRING(URL,string2wstring(mURL.c_str()));
-  RETURN_INTO_OBJREF(cb,iface::cellml_api::CellMLBootstrap,
-    CreateCellMLBootstrap());
-  RETURN_INTO_OBJREF(ml,iface::cellml_api::ModelLoader,cb->modelLoader());
-  iface::cellml_api::Model* model = (iface::cellml_api::Model*)NULL;
-  try
-  {
-    model = ml->loadFromURL(URL.c_str());
-  }
-  catch (...)
-  {
-    std::wcerr << L"Error loading model URL: " << URL.c_str() << std::endl;
-    return -2;
-  }
-  std::wstring codeString = getModelAsCCode((void*)model);
+  std::wstring codeString = getModelAsCCode(mModel,mAnnotations);
   if (codeString.length() > 1)
   {
 #ifdef DYNAMIC_COMPILE
@@ -339,9 +338,9 @@ int CellMLModelDefinition::instantiate()
        delete */
     char templ[64] = "tmp.cellml2code.XXXXXX";
     if (mkdtemp(templ))
-		{
-			// \todo should check for an error...
-		}
+    {
+      // \todo should check for an error...
+    }
     mTmpDirName = templ;
     mTmpDirExists = true;
     sprintf(templ,"%s/cellml2code.XXXXXX",mTmpDirName.c_str());
@@ -358,10 +357,10 @@ int CellMLModelDefinition::instantiate()
     free(dso);
     /* compile the code into a shared object */
     char* compileCommand =
-      (char*)malloc(mCompileCommand.length()+mDsoFileName.length()+
-	mCodeFileName.length()+3);
+        (char*)malloc(mCompileCommand.length()+mDsoFileName.length()+
+            mCodeFileName.length()+3);
     sprintf(compileCommand,"%s %s %s",mCompileCommand.c_str(),
-      mDsoFileName.c_str(),mCodeFileName.c_str());
+        mDsoFileName.c_str(),mCodeFileName.c_str());
     std::cout << "Compile command: \"" << compileCommand << "\"" << std::endl;
     if (system(compileCommand) == 0)
     {
@@ -370,36 +369,36 @@ int CellMLModelDefinition::instantiate()
       mHandle = dlopen(mDsoFileName.c_str(),RTLD_LOCAL|RTLD_LAZY);
       if (mHandle)
       {
-	/* find the required methods */
-	SetupFixedConstants = (void (*)(double*,double*,double*))
-	  dlsym(mHandle,"SetupFixedConstants");
-	if (SetupFixedConstants == NULL) fprintf(stderr,
-	  "Error getting method: SetupFixedConstants\n");
-	ComputeRates = (void (*)(double,double*,double*,double*,double*))
-	  dlsym(mHandle,"ComputeRates");
-	if (ComputeRates == NULL) fprintf(stderr,
-	  "Error getting method: ComputeRates\n");
-	EvaluateVariables = (void (*)(double,double*,double*,double*,double*))
-	  dlsym(mHandle,"EvaluateVariables");
-	if (EvaluateVariables == NULL) fprintf(stderr,
-	  "Error getting method: EvaluateVariables\n");
-	if (SetupFixedConstants && ComputeRates && EvaluateVariables)
-	{
-	  mInstantiated = true;
-	  code = 0;
-	}
-	else
-	{
-	  std::cerr << "Error getting one or more of the required methods."
-		    << std::endl;
-	  code = -6;
-	}
+        /* find the required methods */
+        SetupFixedConstants = (void (*)(double*,double*,double*))
+	      dlsym(mHandle,"SetupFixedConstants");
+        if (SetupFixedConstants == NULL) fprintf(stderr,
+            "Error getting method: SetupFixedConstants\n");
+        ComputeRates = (void (*)(double,double*,double*,double*,double*))
+	      dlsym(mHandle,"ComputeRates");
+        if (ComputeRates == NULL) fprintf(stderr,
+            "Error getting method: ComputeRates\n");
+        EvaluateVariables = (void (*)(double,double*,double*,double*,double*))
+	      dlsym(mHandle,"EvaluateVariables");
+        if (EvaluateVariables == NULL) fprintf(stderr,
+            "Error getting method: EvaluateVariables\n");
+        if (SetupFixedConstants && ComputeRates && EvaluateVariables)
+        {
+          mInstantiated = true;
+          code = 0;
+        }
+        else
+        {
+          std::cerr << "Error getting one or more of the required methods."
+              << std::endl;
+          code = -6;
+        }
       }
       else
       {
-	fprintf(stderr,"Error opening shared object (%s): %s\n",
-	  mDsoFileName.c_str(),dlerror());
-	code = -5;
+        fprintf(stderr,"Error opening shared object (%s): %s\n",
+            mDsoFileName.c_str(),dlerror());
+        code = -5;
       }
     }
     else
@@ -408,17 +407,15 @@ int CellMLModelDefinition::instantiate()
       code = -4;
     }
 #else
-	  std::cerr << codeString.c_str() << std::endl;
-	  code = 0;
+    std::cerr << codeString.c_str() << std::endl;
+    code = 0;
 #endif
   }
   else
   {
-    std::wcerr << L"Error getting C-code for model URL: " << URL.c_str()
-	       << std::endl;
+    std::wcerr << L"Error getting C-code for model." << std::endl;
     code = -3;
   }
-  model->release_ref();
   return code;
 }
 
@@ -501,14 +498,34 @@ wchar_t* string2wstring(const char* str)
 }
 
 std::wstring 
-CellMLModelDefinition::getModelAsCCode(void* _ptr)
+CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
 {
-  iface::cellml_api::Model* model = (iface::cellml_api::Model*)_ptr;
+  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(_model);
+  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(_annotations);
   std::wstring code;
   RETURN_INTO_OBJREF(cgb,iface::cellml_services::CodeGeneratorBootstrap,
     CreateCodeGeneratorBootstrap());
   RETURN_INTO_OBJREF(cg,iface::cellml_services::CodeGenerator,
     cgb->createCodeGenerator());
+  RETURN_INTO_OBJREF(ccg, iface::cellml_services::CustomGenerator,
+      cg->createCustomGenerator(model));
+  RETURN_INTO_OBJREF(cti, iface::cellml_services::ComputationTargetIterator,
+      ccg->iterateTargets());
+  while (true)
+  {
+    RETURN_INTO_OBJREF(ct, iface::cellml_services::ComputationTarget,
+        cti->nextComputationTarget());
+    if (ct == NULL) break;
+    RETURN_INTO_WSTRING(flag,as->getStringAnnotation(ct->variable(),L"flag"));
+    if (flag == L"WANTED")
+    {
+      ccg->requestComputation(ct);
+    }
+    else if (flag == L"KNOWN")
+    {
+      ccg->markAsKnown(ct);
+    }
+  }
   /* The trunk MaLaES has been updated since the 1.5 release, so define a
    * "custom" MaLaES here
    */
@@ -592,115 +609,185 @@ CellMLModelDefinition::getModelAsCCode(void* _ptr)
       L"notanumber: #prec[999]0.0/0.0\r\n"
       L"pi: #prec[999] 3.14159265358979\r\n"
       L"true: #prec[999]1.0\r\n"));
+  /* now can use the standard transformation?
   cg->transform(mt);
+  */
   try
   {
-    RETURN_INTO_OBJREF(cci,iface::cellml_services::CodeInformation,
-      cg->generateCode(model));
+    RETURN_INTO_OBJREF(cci,iface::cellml_services::CustomCodeInformation,ccg->generateCode());
+    printf("Constraint level = ");
+    switch (cci->constraintLevel())
+    {
+    case iface::cellml_services::UNDERCONSTRAINED:
+      printf("UNDERCONSTRAINED\n");
+      break;
+    case iface::cellml_services::UNSUITABLY_CONSTRAINED:
+      printf("UNSUITABLY_CONSTRAINED\n");
+      break;
+    case iface::cellml_services::OVERCONSTRAINED:
+      printf("OVERCONSTRAINED\n");
+      break;
+    case iface::cellml_services::CORRECTLY_CONSTRAINED:
+      printf("CORRECTLY_CONSTRAINED\n");
+      break;
+    default:
+      printf("Unkown value\n");
+    }
+    printf("Index count: %u\n", cci->indexCount());
+    cti = already_AddRefd<iface::cellml_services::ComputationTargetIterator>(cci->iterateTargets());
+    while (true)
+    {
+      RETURN_INTO_OBJREF(ct, iface::cellml_services::ComputationTarget,
+                         cti->nextComputationTarget());
+      if (ct == NULL)
+        break;
+
+      RETURN_INTO_OBJREF(cv, iface::cellml_api::CellMLVariable, ct->variable());
+      RETURN_INTO_WSTRING(compname, cv->componentName());
+      RETURN_INTO_WSTRING(varname, cv->name());
+      printf("* Computation target %S/%S:%u:\n", compname.c_str(), varname.c_str(),
+             ct->degree());
+      printf("  => Type = ");
+      switch (ct->type())
+      {
+      case iface::cellml_services::VARIABLE_OF_INTEGRATION:
+        printf("VARIABLE_OF_INTEGRATION - was marked as independent.\n");
+        break;
+      case iface::cellml_services::CONSTANT:
+        printf("CONSTANT - this should not happen!\n");
+        break;
+      case iface::cellml_services::STATE_VARIABLE:
+        printf("STATE_VARIABLE - was requested, and is available.\n");
+        break;
+      case iface::cellml_services::ALGEBRAIC:
+        printf("ALGEBRAIC - is used as an intermediate.\n");
+        break;
+      case iface::cellml_services::FLOATING:
+        printf("FLOATING - unused and not requested.\n");
+        break;
+      case iface::cellml_services::LOCALLY_BOUND:
+        printf("LOCALLY_BOUND - locally bound in expressions only.\n");
+        break;
+      case iface::cellml_services::PSEUDOSTATE_VARIABLE:
+        printf("PSEUDOSTATE_VARIABLE - target was requested, but could "
+               "not be computed from the independent variables and model.\n");
+        break;
+      default:
+        printf("Unknown type!\n");
+      }
+      RETURN_INTO_WSTRING(targname, ct->name());
+      printf("  => Name = %S\n", targname.c_str());
+      printf("  => Index = %u\n", ct->assignedIndex());
+    }
+    // To do: Print output from cci->iterateTargets();
+    RETURN_INTO_WSTRING(functionsString, cci->functionsString());
+    printf("Functions: %S\n", functionsString.c_str());
+    RETURN_INTO_WSTRING(codeS, cci->generatedCode());
+    printf("Code: %S\n", codeS.c_str());
+#if defined (OLD_CODE)
     wchar_t* m = cci->errorMessage();
     if (!wcscmp(m,L""))
     {
       std::cout << "whoo hoo!" << std::endl;
-      iface::cellml_services::ModelConstraintLevel mcl = 
-	cci->constraintLevel();
+      iface::cellml_services::ModelConstraintLevel mcl = cci->constraintLevel();
       if (mcl == iface::cellml_services::UNDERCONSTRAINED)
       {
-	std::cerr << "Model is underconstrained" << std::endl;
+        std::cerr << "Model is underconstrained" << std::endl;
       }
       else if (mcl == iface::cellml_services::OVERCONSTRAINED)
       {
-	std::cerr << "Model is overconstrained" << std::endl;
+        std::cerr << "Model is overconstrained" << std::endl;
       }
       else if (mcl == iface::cellml_services::UNSUITABLY_CONSTRAINED)
       {
-	std::cerr << "Model is unsuitably constrained" << std::endl;
+        std::cerr << "Model is unsuitably constrained" << std::endl;
       }
       else
       {
-	std::cout << "Model is correctly constrained" << std::endl;
-	// create the code in the format we know how to handle
-	code += L"#include <math.h>\n";
-	code += L"#include <stdio.h>\n";
-	/* required functions */
-	code += L"extern double fabs(double x);\n";
-	code += L"extern double acos(double x);\n";
-	code += L"extern double acosh(double x);\n";
-	code += L"extern double atan(double x);\n";
-	code += L"extern double atanh(double x);\n";
-	code += L"extern double asin(double x);\n";
-	code += L"extern double asinh(double x);\n";
-	code += L"extern double acos(double x);\n";
-	code += L"extern double acosh(double x);\n";
-	code += L"extern double asin(double x);\n";
-	code += L"extern double asinh(double x);\n";
-	code += L"extern double atan(double x);\n";
-	code += L"extern double atanh(double x);\n";
-	code += L"extern double ceil(double x);\n";
-	code += L"extern double cos(double x);\n";
-	code += L"extern double cosh(double x);\n";
-	code += L"extern double tan(double x);\n";
-	code += L"extern double tanh(double x);\n";
-	code += L"extern double sin(double x);\n";
-	code += L"extern double sinh(double x);\n";
-	code += L"extern double exp(double x);\n";
-	code += L"extern double floor(double x);\n";
-	code += L"extern double pow(double x, double y);\n";    
-	code += L"extern double factorial(double x);\n";
-	code += L"extern double log(double x);\n";
-	code += L"extern double arbitrary_log(double x, double base);\n";
-	code += L"extern double gcd_pair(double a, double b);\n";
-	code += L"extern double lcm_pair(double a, double b);\n";
-	code += L"extern double gcd_multi(unsigned int size, ...);\n";
-	code += L"extern double lcm_multi(unsigned int size, ...);\n";
-	code += L"extern double multi_min(unsigned int size, ...);\n";
-	code += L"extern double multi_max(unsigned int size, ...);\n";
-	code += L"extern void NR_MINIMISE(double(*func)"
-	  L"(double VOI, double *C, double *R, double *S, double *A),"
-	  L"double VOI, double *C, double *R, double *S, double *A, "
-	  L"double *V);\n";
-	wchar_t* frag = cci->functionsString();
-	code += frag;
-	free(frag);
+        std::cout << "Model is correctly constrained" << std::endl;
+        // create the code in the format we know how to handle
+        code += L"#include <math.h>\n";
+        code += L"#include <stdio.h>\n";
+        /* required functions */
+        code += L"extern double fabs(double x);\n";
+        code += L"extern double acos(double x);\n";
+        code += L"extern double acosh(double x);\n";
+        code += L"extern double atan(double x);\n";
+        code += L"extern double atanh(double x);\n";
+        code += L"extern double asin(double x);\n";
+        code += L"extern double asinh(double x);\n";
+        code += L"extern double acos(double x);\n";
+        code += L"extern double acosh(double x);\n";
+        code += L"extern double asin(double x);\n";
+        code += L"extern double asinh(double x);\n";
+        code += L"extern double atan(double x);\n";
+        code += L"extern double atanh(double x);\n";
+        code += L"extern double ceil(double x);\n";
+        code += L"extern double cos(double x);\n";
+        code += L"extern double cosh(double x);\n";
+        code += L"extern double tan(double x);\n";
+        code += L"extern double tanh(double x);\n";
+        code += L"extern double sin(double x);\n";
+        code += L"extern double sinh(double x);\n";
+        code += L"extern double exp(double x);\n";
+        code += L"extern double floor(double x);\n";
+        code += L"extern double pow(double x, double y);\n";
+        code += L"extern double factorial(double x);\n";
+        code += L"extern double log(double x);\n";
+        code += L"extern double arbitrary_log(double x, double base);\n";
+        code += L"extern double gcd_pair(double a, double b);\n";
+        code += L"extern double lcm_pair(double a, double b);\n";
+        code += L"extern double gcd_multi(unsigned int size, ...);\n";
+        code += L"extern double lcm_multi(unsigned int size, ...);\n";
+        code += L"extern double multi_min(unsigned int size, ...);\n";
+        code += L"extern double multi_max(unsigned int size, ...);\n";
+        code += L"extern void NR_MINIMISE(double(*func)"
+          L"(double VOI, double *C, double *R, double *S, double *A),"
+          L"double VOI, double *C, double *R, double *S, double *A, "
+          L"double *V);\n";
+        wchar_t* frag = cci->functionsString();
+        code += frag;
+        free(frag);
 
-	nBound = 1;
-	nRates = cci->rateIndexCount();
-	nAlgebraic = cci->algebraicIndexCount();
-	nConstants = cci->constantIndexCount();
-	
-	// start the model code...
-	/* https://svn.physiomeproject.org/svn/physiome/CellML_DOM_API/trunk/interfaces/CCGS.idl for full description */
-  
-	/* initConsts - all variables which aren't state variables but have
-	 *              an initial_value attribute, and any variables & rates
-	 *              which follow.
-	 */
-	frag = cci->initConstsString();
-	code += L"void SetupFixedConstants(double* CONSTANTS,double* RATES,"
-	  L"double* STATES)\n{\n";
-	code += frag;
-	code += L"}\n";
-	free(frag);
+        nBound = 1;
+        nRates = cci->rateIndexCount();
+        nAlgebraic = cci->algebraicIndexCount();
+          nConstants = cci->constantIndexCount();
 
-	/* rates      - All rates which are not static.
-	 */
-	frag = cci->ratesString();
-	code += L"void ComputeRates(double VOI,double* STATES,double* RATES,"
-	  L"double* CONSTANTS,double* ALGEBRAIC)\n{\n";
-	code += frag;
-	code += L"}\n";
-	free(frag);
+        // start the model code...
+        /* https://svn.physiomeproject.org/svn/physiome/CellML_DOM_API/trunk/interfaces/CCGS.idl for full description */
 
-	/* variables  - All variables not computed by initConsts or rates
-	 *  (i.e., these are not required for the integration of the model and
-	 *   thus only need to be called for output or presentation or similar
-	 *   purposes)
-	 */
-	frag = cci->variablesString();
-	code += L"void EvaluateVariables(double VOI,double* CONSTANTS,"
-	  L"double* RATES, double* STATES, double* ALGEBRAIC)\n{\n";
-	code += frag;
-	code += L"}\n";
-	free(frag);
+        /* initConsts - all variables which aren't state variables but have
+         *              an initial_value attribute, and any variables & rates
+         *              which follow.
+         */
+        frag = cci->initConstsString();
+        code += L"void SetupFixedConstants(double* CONSTANTS,double* RATES,"
+          L"double* STATES)\n{\n";
+        code += frag;
+        code += L"}\n";
+        free(frag);
+
+        /* rates      - All rates which are not static.
+         */
+        frag = cci->ratesString();
+        code += L"void ComputeRates(double VOI,double* STATES,double* RATES,"
+          L"double* CONSTANTS,double* ALGEBRAIC)\n{\n";
+        code += frag;
+        code += L"}\n";
+        free(frag);
+
+        /* variables  - All variables not computed by initConsts or rates
+         *  (i.e., these are not required for the integration of the model and
+         *   thus only need to be called for output or presentation or similar
+         *   purposes)
+         */
+        frag = cci->variablesString();
+        code += L"void EvaluateVariables(double VOI,double* CONSTANTS,"
+          L"double* RATES, double* STATES, double* ALGEBRAIC)\n{\n";
+        code += frag;
+        code += L"}\n";
+        free(frag);
       }
     }
     else
@@ -708,6 +795,7 @@ CellMLModelDefinition::getModelAsCCode(void* _ptr)
       std::wcerr << "Error generating code: " << m << std::endl;
     }
     free(m);
+#endif
   }
   catch (...)
   {

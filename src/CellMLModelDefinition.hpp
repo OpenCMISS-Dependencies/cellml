@@ -119,9 +119,10 @@ class CellMLModelDefinition
   /**
    * Generate C code for the given CellML model.
    * @param model The CellML model for which to generate C code.
+   * @param annotations The annotation set used to annotate known and wanted variables.
    * @return The generated code, if successful; and empty string otherwise.
    */
-  std::wstring getModelAsCCode(void* model);
+  std::wstring getModelAsCCode(void* model,void* annotations);
   std::string mURL;
   std::string mTmpDirName;
   bool mTmpDirExists;
@@ -139,6 +140,8 @@ class CellMLModelDefinition
   void* mModel;
   void* mCodeInformation;
   void* mAnnotations;
+  int mNumberOfWantedVariables;
+  int mNumberOfKnownVariables;
 };
 
 #endif // _CELLMLMODELDEFINITION_H_
