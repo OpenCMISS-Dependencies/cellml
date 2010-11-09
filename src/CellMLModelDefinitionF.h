@@ -79,40 +79,18 @@ extern "C"
   int cellml_model_definition_get_n_algebraic_f(void* model);
 
   /**
-   * Call the model's SetupFixedConstant method.
+   * Call the model's right-hand-side method.
+   * This method evaluates all required equations in this model's system of ODEs.
    * @param model The CellML model definition to use.
-   * @param constants The array to use for constants.
+   * @param voi The current value of the variable of integration (usually time).
+   * @param states The array to use for state variables.
    * @param rates The array to use for rates.
-   * @param states The array to use for states.
+   * @param wanted The array to use for wanted variables - i.e., those model outputs previously flagged as wanted to indicate that their value will be used externally.
+   * @param known The array to use for known variables - i.e., those model parameters previously flagged as known to indicate that their value will be set externally.
    */
-  void cellml_model_definition_call_setup_fixed_constants_f(void* model,
-    double* constants, double* rates, double* states);
-
-  /**
-   * Call the model's ComputeRates method.
-   * @param model The CellML model definition to use.
-   * @param voi The current value of the variable of integration.
-   * @param states The array to use for states.
-   * @param rates The array to use for rates.
-   * @param rates The array to use for constants.
-   * @param rates The array to use for algebraic.
-   */
-  void cellml_model_definition_call_compute_rates_f(void* model,
-    double voi, double* states, double* rates, double* constants, 
-    double* algebraic);
-
-  /**
-   * Call the model's EvaluateVariables method.
-   * @param model The CellML model definition to use.
-   * @param voi The current value of the variable of integration.
-   * @param states The array to use for states.
-   * @param rates The array to use for rates.
-   * @param rates The array to use for constants.
-   * @param rates The array to use for algebraic.
-   */
-  void cellml_model_definition_call_evaluate_variables_f(void* model,
-    double voi, double* states, double* rates, double* constants, 
-    double* algebraic);
+  void cellml_model_definition_call_rhs_routine_f(void* model,
+    double voi, double* states, double* rates, double* wanted,
+    double* known);
 
 #ifdef __cplusplus
 } /* extern C */

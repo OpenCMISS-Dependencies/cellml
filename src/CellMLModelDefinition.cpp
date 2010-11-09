@@ -35,12 +35,12 @@
 typedef std::pair<std::string,std::string> CVpair;
 static CVpair splitName(const char* s);
 
-/*static std::wstring formatNumber(const int value)
+static std::wstring formatNumber(const int value)
 {
   wchar_t valueString[100];
   swprintf(valueString,100,L"%d",value);
   return std::wstring(valueString);
-}
+}/*
 static std::wstring formatNumber(const uint32_t value)
 {
   wchar_t valueString[100];
@@ -67,6 +67,9 @@ CellMLModelDefinition::CellMLModelDefinition()
   nConstants = -1;
   mNumberOfWantedVariables = 0;
   mNumberOfKnownVariables = 0;
+  mStateCounter = 0;
+  mIntermediateCounter = 0;
+  mParameterCounter = 0;
   mModel = NULL;
   mCodeInformation = NULL;
   mAnnotations = NULL;
@@ -87,6 +90,9 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   nConstants = -1;
   mNumberOfWantedVariables = 0;
   mNumberOfKnownVariables = 0;
+  mStateCounter = 0;
+  mIntermediateCounter = 0;
+  mParameterCounter = 0;
   mModel = NULL;
   mCodeInformation = NULL;
   mAnnotations = NULL;
@@ -131,12 +137,20 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
           if (ct->type() == iface::cellml_services::STATE_VARIABLE)
           {
             as->setStringAnnotation(ct->variable(),L"flag",L"WANTED");
+            as->setStringAnnotation(ct->variable(),L"array",L"OC_STATE");
+            as->setStringAnnotation(ct->variable(),L"array_index",formatNumber(mStateCounter).c_str());
+            mStateCounter++;
             mNumberOfWantedVariables++;
           }
           else if (ct->type() == iface::cellml_services::VARIABLE_OF_INTEGRATION)
           {
             as->setStringAnnotation(ct->variable(),L"flag",L"KNOWN");
             mNumberOfKnownVariables++;
+          }
+          else if (ct->degree() > 0)
+          {
+            as->setStringAnnotation(ct->variable(),L"flag-degree",L"WANTED");
+            mNumberOfWantedVariables++;
           }
         }
       }
@@ -198,7 +212,7 @@ CellMLModelDefinition::~CellMLModelDefinition()
 }
 
 static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t* typeString,
-    std::vector<iface::cellml_services::VariableEvaluationType> vets)
+    std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount)
 {
   if (! d->mCodeInformation)
   {
@@ -247,7 +261,7 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
     }
     else
     {
-      std::cerr << "CellMLModelDefinition::flagVariacompname, cv->componentName()ble -- variable already flagged something else: "
+      std::cerr << "CellMLModelDefinition::flagVariable -- variable already flagged something else: "
           << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
       return -5;
     }
@@ -291,6 +305,12 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
   if (compatible)
   {
     as->setStringAnnotation(sv,L"flag",typeString);
+    std::wstring ename(L"OC_");
+    ename += typeString;
+    as->setStringAnnotation(sv,L"array",ename.c_str());
+    as->setStringAnnotation(ct->variable(),L"array_index",formatNumber(specificCount).c_str());
+    specificCount++;
+    count++;
   }
   else
   {
@@ -306,11 +326,11 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
 int CellMLModelDefinition::setVariableAsKnown(const char* name)
 {
   std::vector<iface::cellml_services::VariableEvaluationType> vets;
+  // initially, only allow parameters to be controlled by OpenCMISS(cm)
   vets.push_back(iface::cellml_services::CONSTANT);
-  vets.push_back(iface::cellml_services::VARIABLE_OF_INTEGRATION);
-  vets.push_back(iface::cellml_services::FLOATING);
-  int code = flagVariable(this,name,L"KNOWN",vets);
-  if (code == 0) mNumberOfKnownVariables++;
+  //vets.push_back(iface::cellml_services::VARIABLE_OF_INTEGRATION);
+  //vets.push_back(iface::cellml_services::FLOATING);
+  int code = flagVariable(this,name,L"KNOWN",vets,mNumberOfKnownVariables,mParameterCounter);
   return code;
 }
 
@@ -320,9 +340,8 @@ int CellMLModelDefinition::setVariableAsWanted(const char* name)
   vets.push_back(iface::cellml_services::STATE_VARIABLE);
   vets.push_back(iface::cellml_services::PSEUDOSTATE_VARIABLE);
   vets.push_back(iface::cellml_services::ALGEBRAIC);
-  vets.push_back(iface::cellml_services::LOCALLY_BOUND);
-  int code = flagVariable(this,name,L"WANTED",vets);
-  if (code == 0) mNumberOfWantedVariables++;
+  //vets.push_back(iface::cellml_services::LOCALLY_BOUND);
+  int code = flagVariable(this,name,L"WANTED",vets,mNumberOfWantedVariables,mIntermediateCounter);
   return code;
 }
 
@@ -370,19 +389,9 @@ int CellMLModelDefinition::instantiate()
       if (mHandle)
       {
         /* find the required methods */
-        SetupFixedConstants = (void (*)(double*,double*,double*))
-	      dlsym(mHandle,"SetupFixedConstants");
-        if (SetupFixedConstants == NULL) fprintf(stderr,
-            "Error getting method: SetupFixedConstants\n");
-        ComputeRates = (void (*)(double,double*,double*,double*,double*))
-	      dlsym(mHandle,"ComputeRates");
-        if (ComputeRates == NULL) fprintf(stderr,
-            "Error getting method: ComputeRates\n");
-        EvaluateVariables = (void (*)(double,double*,double*,double*,double*))
-	      dlsym(mHandle,"EvaluateVariables");
-        if (EvaluateVariables == NULL) fprintf(stderr,
-            "Error getting method: EvaluateVariables\n");
-        if (SetupFixedConstants && ComputeRates && EvaluateVariables)
+        rhsRoutine = (void (*)(double,double*,double*,double*,double*)) dlsym(mHandle,"OC_CellML_RHS_routine");
+        if (rhsRoutine == NULL) fprintf(stderr,"Error getting method: ComputeRates\n");
+        if (rhsRoutine)
         {
           mInstantiated = true;
           code = 0;
@@ -497,6 +506,22 @@ wchar_t* string2wstring(const char* str)
   return((wchar_t*)NULL);
 }
 
+static void clearCodeAssignments(std::wstring& s,const wchar_t* array,int count)
+{
+  for (int i=0;i<count;i++)
+  {
+    std::wstring search(array);
+    std::wstring r(L"DUMMY_ASSIGNMENT /*");
+    search += L"[";
+    search += formatNumber(i);
+    search += L"]";
+    r += search;
+    search += L" = ";
+    r += L"*/ = ";
+    s.replace(s.find(search),search.size(),r);
+  }
+}
+
 std::wstring 
 CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
 {
@@ -507,6 +532,7 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
     CreateCodeGeneratorBootstrap());
   RETURN_INTO_OBJREF(cg,iface::cellml_services::CodeGenerator,
     cgb->createCodeGenerator());
+#if defined (CUSTOM_CODE_GENERATION)
   RETURN_INTO_OBJREF(ccg, iface::cellml_services::CustomGenerator,
       cg->createCustomGenerator(model));
   RETURN_INTO_OBJREF(cti, iface::cellml_services::ComputationTargetIterator,
@@ -517,7 +543,7 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
         cti->nextComputationTarget());
     if (ct == NULL) break;
     RETURN_INTO_WSTRING(flag,as->getStringAnnotation(ct->variable(),L"flag"));
-    if (flag == L"WANTED")
+    if ((flag == L"WANTED") || (ct->degree() > 0))
     {
       ccg->requestComputation(ct);
     }
@@ -526,6 +552,7 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
       ccg->markAsKnown(ct);
     }
   }
+#endif
   /* The trunk MaLaES has been updated since the 1.5 release, so define a
    * "custom" MaLaES here
    */
@@ -614,6 +641,7 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
   */
   try
   {
+#if defined (CUSTOM_CODE_GENERATION)
     RETURN_INTO_OBJREF(cci,iface::cellml_services::CustomCodeInformation,ccg->generateCode());
     printf("Constraint level = ");
     switch (cci->constraintLevel())
@@ -684,7 +712,36 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
     printf("Functions: %S\n", functionsString.c_str());
     RETURN_INTO_WSTRING(codeS, cci->generatedCode());
     printf("Code: %S\n", codeS.c_str());
-#if defined (OLD_CODE)
+#else // CUSTOM_CODE_GENERATION
+    // annotate the source variables in the model with the code-names based on existing annotations
+    RETURN_INTO_OBJREF(cvbs,iface::cellml_services::CeVASBootstrap,CreateCeVASBootstrap());
+    RETURN_INTO_OBJREF(cevas,iface::cellml_services::CeVAS,cvbs->createCeVASForModel(model));
+    for (unsigned int i=0;i<cevas->length();i++)
+    {
+      RETURN_INTO_OBJREF(cvs,iface::cellml_services::ConnectedVariableSet,cevas->getVariableSet(i));
+      RETURN_INTO_OBJREF(sv,iface::cellml_api::CellMLVariable,cvs->sourceVariable());
+      RETURN_INTO_WSTRING(array,as->getStringAnnotation(sv,L"array"));
+      RETURN_INTO_WSTRING(index,as->getStringAnnotation(sv,L"array_index"));
+      if (!array.empty() && !index.empty())
+      {
+        std::wstring ename = array;
+        ename += L"[";
+        ename += index;
+        ename += L"]";
+        as->setStringAnnotation(sv,L"expression",ename.c_str());
+        if (array == L"OC_STATE")
+        {
+          ename = std::wstring(L"OC_RATE");
+          ename += L"[";
+          ename += index;
+          ename += L"]";
+          as->setStringAnnotation(sv,L"expression_d1",ename.c_str());
+        }
+      }
+    }
+    cg->useCeVAS(cevas);
+    cg->useAnnoSet(as);
+    RETURN_INTO_OBJREF(cci,iface::cellml_services::CodeInformation,cg->generateCode(model));
     wchar_t* m = cci->errorMessage();
     if (!wcscmp(m,L""))
     {
@@ -752,7 +809,15 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
         nBound = 1;
         nRates = cci->rateIndexCount();
         nAlgebraic = cci->algebraicIndexCount();
-          nConstants = cci->constantIndexCount();
+        nConstants = cci->constantIndexCount();
+
+        code += L"\n\nvoid OC_CellML_RHS_routine(double VOI, double* OC_STATE, double* OC_RATE, double* OC_WANTED, double* OC_KNOWN)\n{\n\n";
+        code += L"double DUMMY_ASSIGNMENT;\n";
+        code += L"double CONSTANTS[";
+        code += formatNumber(nConstants);
+        code += L"], ALGEBRAIC[";
+        code += formatNumber(nAlgebraic);
+        code += L"];\n\n";
 
         // start the model code...
         /* https://svn.physiomeproject.org/svn/physiome/CellML_DOM_API/trunk/interfaces/CCGS.idl for full description */
@@ -762,19 +827,19 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
          *              which follow.
          */
         frag = cci->initConstsString();
-        code += L"void SetupFixedConstants(double* CONSTANTS,double* RATES,"
-          L"double* STATES)\n{\n";
+        //code += L"void SetupFixedConstants(double* CONSTANTS,double* RATES,"
+        //  L"double* STATES)\n{\n";
         code += frag;
-        code += L"}\n";
+        //code += L"}\n";
         free(frag);
 
         /* rates      - All rates which are not static.
          */
         frag = cci->ratesString();
-        code += L"void ComputeRates(double VOI,double* STATES,double* RATES,"
-          L"double* CONSTANTS,double* ALGEBRAIC)\n{\n";
+        //code += L"void ComputeRates(double VOI,double* STATES,double* RATES,"
+        //  L"double* CONSTANTS,double* ALGEBRAIC)\n{\n";
         code += frag;
-        code += L"}\n";
+        //code += L"}\n";
         free(frag);
 
         /* variables  - All variables not computed by initConsts or rates
@@ -783,11 +848,18 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
          *   purposes)
          */
         frag = cci->variablesString();
-        code += L"void EvaluateVariables(double VOI,double* CONSTANTS,"
-          L"double* RATES, double* STATES, double* ALGEBRAIC)\n{\n";
+        //code += L"void EvaluateVariables(double VOI,double* CONSTANTS,"
+        //  L"double* RATES, double* STATES, double* ALGEBRAIC)\n{\n";
         code += frag;
-        code += L"}\n";
+        //code += L"}\n";
         free(frag);
+
+        // and now clear out initialisation of state variables and known variables.
+        clearCodeAssignments(code,L"OC_STATE",mStateCounter);
+        clearCodeAssignments(code,L"OC_KNOWN",mParameterCounter);
+
+        // close the subroutine
+        code += L"\n\n}//OC_CellML_RHS_routine()\n\n;";
       }
     }
     else
@@ -795,7 +867,7 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
       std::wcerr << "Error generating code: " << m << std::endl;
     }
     free(m);
-#endif
+#endif // CUSTOM_CODE_GENERATION
   }
   catch (...)
   {

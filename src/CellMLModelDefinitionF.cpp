@@ -187,30 +187,13 @@ int cellml_model_definition_get_n_algebraic_f(void* _ptr)
   return code;
 }
 
-void cellml_model_definition_call_setup_fixed_constants_f(void* _ptr,
-  double* constants, double* rates, double* states)
+void cellml_model_definition_call_rhs_routine_f(void* _ptr,
+  double voi,double* states, double* rates, double* wanted,
+  double* known)
 {
   // no error checks to optimise?
   CellMLModelDefinition* def = (CellMLModelDefinition*)_ptr;
-  def->SetupFixedConstants(constants,rates,states);
-}
-
-void cellml_model_definition_call_compute_rates_f(void* _ptr,
-  double voi,double* states, double* rates, double* constants, 
-  double* algebraic)
-{
-  // no error checks to optimise?
-  CellMLModelDefinition* def = (CellMLModelDefinition*)_ptr;
-  def->ComputeRates(voi,states,rates,constants,algebraic);
-}
-
-void cellml_model_definition_call_evaluate_variables_f(void* _ptr,
-  double voi,double* states, double* rates, double* constants, 
-  double* algebraic)
-{
-  // no error checks to optimise?
-  CellMLModelDefinition* def = (CellMLModelDefinition*)_ptr;
-  def->EvaluateVariables(voi,constants,rates,states,algebraic);
+  def->rhsRoutine(voi,states,rates,wanted,known);
 }
 
 static char* getAbsoluteURI(const char* uri)

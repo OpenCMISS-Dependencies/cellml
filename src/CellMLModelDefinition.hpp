@@ -99,21 +99,10 @@ class CellMLModelDefinition
   int32_t nConstants;
 
   // loaded from the generated and compiled DSO
-  /* Initialise all variables which aren't state variables but have an
-   * initial_value attribute, and any variables & rates which follow.
+  /* Compute the RHS of the system of the ODE system
    */
-  void (*SetupFixedConstants)(double* CONSTANTS,double* RATES,double* STATES);
-  /* Compute all rates which are not static
-   */
-  void (*ComputeRates)(double VOI,double* STATES,double* RATES,
-    double* CONSTANTS,double* ALGEBRAIC);
-  /* Compute all variables not computed by initConsts or rates
-   *  (i.e., these are not required for the integration of the model and
-   *   thus only need to be called for output or presentation or similar
-   *   purposes)
-   */
-  void (*EvaluateVariables)(double VOI,double* CONSTANTS,double* RATES,
-    double* STATES,double* ALGEBRAIC);
+  void (*rhsRoutine)(double VOI,double* STATES,double* RATES,
+    double* WANTED,double* KNOWN);
 
  private:
   /**
@@ -142,6 +131,9 @@ class CellMLModelDefinition
   void* mAnnotations;
   int mNumberOfWantedVariables;
   int mNumberOfKnownVariables;
+  int mStateCounter;
+  int mIntermediateCounter;
+  int mParameterCounter;
 };
 
 #endif // _CELLMLMODELDEFINITION_H_
