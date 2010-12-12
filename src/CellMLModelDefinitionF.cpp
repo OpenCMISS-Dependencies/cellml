@@ -145,7 +145,7 @@ int cellml_model_definition_get_n_constants_f(void* _ptr)
   CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
   if (_ptr && (def = (CellMLModelDefinition*)_ptr) && def->instantiated())
   {
-    code = def->nConstants;
+    code = def->mParameterCounter;
   }
   else
   {
@@ -161,7 +161,7 @@ int cellml_model_definition_get_n_rates_f(void* _ptr)
   CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
   if (_ptr && (def = (CellMLModelDefinition*)_ptr) && def->instantiated())
   {
-    code = def->nRates;
+    code = def->mStateCounter;
   }
   else
   {
@@ -177,7 +177,7 @@ int cellml_model_definition_get_n_algebraic_f(void* _ptr)
   CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
   if (_ptr && (def = (CellMLModelDefinition*)_ptr) && def->instantiated())
   {
-    code = def->nAlgebraic;
+    code = def->mIntermediateCounter;
   }
   else
   {
