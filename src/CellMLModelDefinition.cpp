@@ -34,6 +34,7 @@
  */
 typedef std::pair<std::string,std::string> CVpair;
 static CVpair splitName(const char* s);
+static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::Model* model,const char* name);
 
 static std::wstring formatNumber(const int value)
 {
@@ -211,6 +212,46 @@ CellMLModelDefinition::~CellMLModelDefinition()
   }
 }
 
+int CellMLModelDefinition::getInitialValue(const char* name,double* value)
+{
+  int code = -1;
+  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
+  if (!model)
+  {
+    std::cerr << "CellMLModelDefinition::getInitialValue -- missing model?" << std::endl;
+    return -2;
+  }
+  RETURN_INTO_OBJREF(var,iface::cellml_api::CellMLVariable,findLocalVariable(model,name));
+  if (!var)
+  {
+    std::cerr << "CellMLModelDefinition::getInitialValue -- unable to find named variable: " << name << std::endl;
+    return -3;
+  }
+  RETURN_INTO_WSTRING(iv,var->initialValue());
+  if (iv != L"")
+  {
+    wchar_t* end;
+    double v = wcstod(iv.c_str(),&end);
+    if (end == NULL || *end != 0)
+    {
+      std::wcerr << "CellMLModelDefinition::getInitialValue -- variable " << name << " has non-numeric initial value: "
+          << iv.c_str() << std::endl;
+      code = -5;
+    }
+    else
+    {
+      *value = v;
+      code = 0;
+    }
+  }
+  else
+  {
+    std::cerr << "CellMLModelDefinition::getInitialValue -- variable " << name << " has no initial value." << std::endl;
+    code = -4;
+  }
+  return code;
+}
+
 static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t* typeString,
     std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount)
 {
@@ -219,37 +260,11 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
     std::cerr << "CellMLModelDefinition::flagVariable -- missing model?" << std::endl;
     return -1;
   }
-  CVpair cv = splitName(name);
   //std::cout << "setting variable '" << cv.second.c_str() << "' from component '" << cv.first.c_str() << "' as KNOWN" << std::endl;
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(d->mModel);
   iface::cellml_services::CodeInformation* cci= static_cast<iface::cellml_services::CodeInformation*>(d->mCodeInformation);
   iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(d->mAnnotations);
-  // find named variable - in local components only!
-  RETURN_INTO_OBJREF(components,iface::cellml_api::CellMLComponentSet,model->localComponents());
-  RETURN_INTO_WSTRING(cname,string2wstring(cv.first.c_str()));
-  RETURN_INTO_OBJREF(component,iface::cellml_api::CellMLComponent,components->getComponent(cname.c_str()));
-  if (!component)
-  {
-    std::cerr << "CellMLModelDefinition::flagVariable -- unable to find component: " << cv.first.c_str() << std::endl;
-    return -2;
-  }
-  RETURN_INTO_OBJREF(variables,iface::cellml_api::CellMLVariableSet,component->variables());
-  RETURN_INTO_WSTRING(vname,string2wstring(cv.second.c_str()));
-  RETURN_INTO_OBJREF(variable,iface::cellml_api::CellMLVariable,variables->getVariable(vname.c_str()));
-  if (!variable)
-  {
-    std::cerr << "CellMLModelDefinition::flagVariable -- unable to find variable: " << cv.first.c_str() << " / "
-        << cv.second.c_str() << std::endl;
-    return -3;
-  }
-  // get source variable
-  RETURN_INTO_OBJREF(sv,iface::cellml_api::CellMLVariable,variable->sourceVariable());
-  if (!sv)
-  {
-    std::cerr << "CellMLModelDefinition::flagVariable -- unable get source variable for variable: "
-        << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
-    return -4;
-  }
+  RETURN_INTO_OBJREF(sv,iface::cellml_api::CellMLVariable,findLocalVariable(model,name));
   // check if source is already marked as known - what to do? safe to continue with no error
   RETURN_INTO_WSTRING(currentAnnotation,as->getStringAnnotation(sv,L"flag"));
   if (!currentAnnotation.empty())
@@ -262,7 +277,7 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
     else
     {
       std::cerr << "CellMLModelDefinition::flagVariable -- variable already flagged something else: "
-          << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
+          << name << std::endl;
       return -5;
     }
   }
@@ -288,7 +303,7 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
   if (!ct)
   {
     std::cerr << "CellMLModelDefinition::flagVariable -- unable get computation target for the source of variable: "
-        << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
+        << name << std::endl;
     return -5;
   }
 
@@ -315,7 +330,7 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
   else
   {
     std::cerr << "CellMLModelDefinition::flagVariable -- computation target for variable: "
-        << cv.first.c_str() << " / " << cv.second.c_str() << "; is the wrong type to be flagged" << std::endl;
+        << name << "; is the wrong type to be flagged" << std::endl;
     ct->release_ref();
     return -5;
   }
@@ -447,6 +462,39 @@ static CVpair splitName(const char* s)
     }
   }
   return p;
+}
+
+static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::Model* model,const char* name)
+{
+  iface::cellml_api::CellMLVariable* v = NULL;
+  // find named variable - in local components only!
+  CVpair cv = splitName(name);
+  RETURN_INTO_OBJREF(components,iface::cellml_api::CellMLComponentSet,model->localComponents());
+  RETURN_INTO_WSTRING(cname,string2wstring(cv.first.c_str()));
+  RETURN_INTO_OBJREF(component,iface::cellml_api::CellMLComponent,components->getComponent(cname.c_str()));
+  if (!component)
+  {
+    std::cerr << "CellMLModelDefinition::findLocalVariable -- unable to find component: " << cv.first.c_str() << std::endl;
+    return NULL;
+  }
+  RETURN_INTO_OBJREF(variables,iface::cellml_api::CellMLVariableSet,component->variables());
+  RETURN_INTO_WSTRING(vname,string2wstring(cv.second.c_str()));
+  RETURN_INTO_OBJREF(variable,iface::cellml_api::CellMLVariable,variables->getVariable(vname.c_str()));
+  if (!variable)
+  {
+    std::cerr << "CellMLModelDefinition::findLocalVariable -- unable to find variable: " << cv.first.c_str() << " / "
+        << cv.second.c_str() << std::endl;
+    return NULL;
+  }
+  // get source variable
+  v = variable->sourceVariable();
+  if (!v)
+  {
+    std::cerr << "CellMLModelDefinition::findLocalVariable -- unable get source variable for variable: "
+        << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
+    return NULL;
+  }
+  return v;
 }
 
 #if 0

@@ -20,6 +20,16 @@ extern "C"
   void destroy_cellml_model_definition_f(void** model);
 
   /**
+   * Get the initial value (if specified) of the named variable.
+   * @param model An existing CellML model definition object.
+   * @param name NULL-terminated string containing the name of the model variable to get the initial value of. This string
+   * should be in the format of 'component_name/variable_name'.
+   * @param value On successful exit, will be the initial value of the named variable; otherwise uninitialised.
+   * @return zero if no error occured; otherwise non-zero to indicate and error occured and value is not set.
+   */
+  int cellml_model_definition_get_initial_value_f(void* model,const char* name,double* value);
+
+  /**
    * Flag the specified variable as being 'known' for the purposes of code generation. This implies
    * that the variable will have its value set externally to the CellML model.
    * @param model An existing CellML model definition object.

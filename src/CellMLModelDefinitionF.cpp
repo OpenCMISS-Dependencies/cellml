@@ -60,6 +60,22 @@ void destroy_cellml_model_definition_f(void** _ptr)
   }
 }
 
+int cellml_model_definition_get_initial_value_f(void* _ptr,const char* name,double* value)
+{
+  int return_code = -1;
+  CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
+  if (_ptr && (def = (CellMLModelDefinition*)_ptr))
+  {
+    return_code = def->getInitialValue(name,value);
+  }
+  else
+  {
+    std::cerr << "[cellml_model_definition_get_initial_value_f] "
+        << "Invalid arguments." << std::endl;
+  }
+  return return_code;
+}
+
 int cellml_model_definition_set_variable_as_known_f(void* _ptr,const char* name)
 {
   int return_code = -1;
