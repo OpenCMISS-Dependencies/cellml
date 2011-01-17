@@ -56,7 +56,8 @@ static wchar_t* string2wstring(const char* str);
 
 CellMLModelDefinition::CellMLModelDefinition()
 {
-  mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
+  //mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
+  mCompileCommand = "gcc -fPIC -g -shared -x c -o";
   mTmpDirExists = false;
   mCodeFileExists = false;
   mDsoFileExists = false;
@@ -79,7 +80,8 @@ CellMLModelDefinition::CellMLModelDefinition()
 CellMLModelDefinition::CellMLModelDefinition(const char* url) :
 		mURL(url)
 {
-  mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
+  //mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
+  mCompileCommand = "gcc -fPIC -g -shared -x c -o";
   mTmpDirExists = false;
   mCodeFileExists = false;
   mDsoFileExists = false;
