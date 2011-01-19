@@ -1,0 +1,501 @@
+GFORTRAN module version '4' created from /media/Data_/opencmiss/cellml/src/cellml_model_definition.f90 on Wed Jan 19 09:46:12 2011
+MD5:39aa7b05e3462c7c5cf184e9aaea8d47 -- If you edit this, you'll get what you deserve.
+
+(() () () () () () () () () () () () () () () () () () () () () () () ()
+() () ())
+
+()
+
+()
+
+()
+
+()
+
+()
+
+(2 '__iso_c_binding' '__iso_c_binding' '__iso_c_binding' 1 ((MODULE
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 INTRINSIC) (UNKNOWN 0 0
+0 UNKNOWN ()) 0 0 () () 0 () () () 2 0)
+3 'c_alert' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 1 1
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (
+CONSTANT (CHARACTER 1 1 1 UNKNOWN (())) 0 1 '\U00000007') () 0 () () ()
+2 32)
+4 'c_associated' '__iso_c_binding' '__iso_c_binding_c_associated' 1 ((
+PROCEDURE UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 FUNCTION
+ALWAYS_EXPLICIT IS_ISO_C) (LOGICAL 4 0 0 LOGICAL ()) 5 0 (6 7) () 4 () ()
+() 2 44)
+8 'c_backspace' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 1 1
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (
+CONSTANT (CHARACTER 1 1 1 UNKNOWN (())) 0 1 '\U00000008') () 0 () () ()
+2 33)
+9 'c_bool' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+LOGICAL ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '1') () 0 () ()
+() 2 29)
+10 'c_carriage_return' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 1 1
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (
+CONSTANT (CHARACTER 1 1 1 UNKNOWN (())) 0 1 '\U0000000d') () 0 () () ()
+2 36)
+11 'c_char' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+CHARACTER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '1') () 0 ()
+() () 2 30)
+12 'c_double' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+REAL ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () () ()
+2 24)
+13 'c_double_complex' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+COMPLEX ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 27)
+14 'c_f_pointer' '__iso_c_binding' '__iso_c_binding_c_f_pointer' 1 ((
+PROCEDURE UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE
+ALWAYS_EXPLICIT IS_ISO_C) (UNKNOWN 0 0 0 UNKNOWN ()) 15 0 (16 17 18) ()
+0 () () () 2 43)
+19 'c_f_procpointer' '__iso_c_binding' '__iso_c_binding_c_f_procpointer'
+1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE
+IS_ISO_C) (UNKNOWN 0 0 0 UNKNOWN ()) 20 0 (21 22) () 0 () () () 2 47)
+23 'c_float' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+REAL ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '4') () 0 () () ()
+2 23)
+24 'c_float_complex' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+COMPLEX ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '4') () 0 () ()
+() 2 26)
+25 'c_form_feed' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 1 1
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (
+CONSTANT (CHARACTER 1 1 1 UNKNOWN (())) 0 1 '\U0000000c') () 0 () () ()
+2 34)
+26 'c_funloc' '__iso_c_binding' '__iso_c_binding_c_funloc' 1 ((
+PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 EXTERNAL
+FUNCTION PURE IS_ISO_C) (DERIVED 27 0 0 DERIVED ()) 0 0 () () 26 () () ()
+2 46)
+27 'c_funptr' '__iso_c_binding' '' 1 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 27 1 1 UNKNOWN ()) 0 0 () () 0 ((28 '__c_funptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 41 0)
+29 'c_horizontal_tab' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 1 1
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (
+CONSTANT (CHARACTER 1 1 1 UNKNOWN (())) 0 1 '\U00000009') () 0 () () ()
+2 37)
+30 'c_int' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '4') () 0 () ()
+() 2 0)
+31 'c_int128_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '16') () 0 ()
+() () 2 12)
+32 'c_int16_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '2') () 0 () ()
+() 2 9)
+33 'c_int32_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '4') () 0 () ()
+() 2 10)
+34 'c_int64_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 11)
+35 'c_int8_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '1') () 0 () ()
+() 2 8)
+36 'c_int_fast128_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '16') () 0 ()
+() () 2 22)
+37 'c_int_fast16_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 19)
+38 'c_int_fast32_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 20)
+39 'c_int_fast64_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 21)
+40 'c_int_fast8_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '1') () 0 () ()
+() 2 18)
+41 'c_int_least128_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '16') () 0 ()
+() () 2 17)
+42 'c_int_least16_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '2') () 0 () ()
+() 2 14)
+43 'c_int_least32_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '4') () 0 () ()
+() 2 15)
+44 'c_int_least64_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 16)
+45 'c_int_least8_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '1') () 0 () ()
+() 2 13)
+46 'c_intmax_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 4)
+47 'c_intptr_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 5)
+48 'c_loc' '__iso_c_binding' '__iso_c_binding_c_loc' 1 ((PROCEDURE
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 EXTERNAL FUNCTION PURE
+IS_ISO_C) (DERIVED 49 0 0 DERIVED ()) 0 0 () () 48 () () () 2 45)
+50 'c_long' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 2)
+51 'c_long_double' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+REAL ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '10') () 0 () ()
+() 2 25)
+52 'c_long_double_complex' '__iso_c_binding' '' 1 ((PARAMETER
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (
+INTEGER 4 1 1 COMPLEX ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0
+'10') () 0 () () () 2 28)
+53 'c_long_long' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 3)
+54 'c_new_line' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 1 1
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (
+CONSTANT (CHARACTER 1 1 1 UNKNOWN (())) 0 1 '\U0000000a') () 0 () () ()
+2 35)
+55 'c_null_char' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 1 1
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (
+CONSTANT (CHARACTER 1 1 1 UNKNOWN (())) 0 1 '\U00000000') () 0 () () ()
+2 31)
+56 'c_null_funptr' '__iso_c_binding' '__iso_c_binding_c_null_funptr' 1 (
+(PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0
+IS_BIND_C IS_C_INTEROP IS_ISO_C) (DERIVED 27 1 1 UNKNOWN ()) 0 0 () (
+STRUCTURE (DERIVED 27 0 0 DERIVED ()) 0 (((NULL (UNKNOWN 0 0 1 UNKNOWN ())
+0) ())) ()) () 0 () () () 2 42)
+57 'c_null_ptr' '__iso_c_binding' '__iso_c_binding_c_null_ptr' 1 ((
+PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0
+IS_BIND_C IS_C_INTEROP IS_ISO_C) (DERIVED 49 1 1 UNKNOWN ()) 0 0 () (
+STRUCTURE (DERIVED 49 0 0 DERIVED ()) 0 (((NULL (UNKNOWN 0 0 1 UNKNOWN ())
+0) ())) ()) () 0 () () () 2 40)
+49 'c_ptr' '__iso_c_binding' '' 1 ((DERIVED UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (DERIVED 49 1 1
+UNKNOWN ()) 0 0 () () 0 ((58 '__c_ptr_c_address' (INTEGER 8 1 0 INTEGER
+()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
+UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+59 'c_short' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '2') () 0 () ()
+() 2 1)
+60 'c_signed_char' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '1') () 0 () ()
+() 2 7)
+61 'c_size_t' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (INTEGER 4 1 1
+INTEGER ()) 0 0 () (CONSTANT (INTEGER 4 1 1 UNKNOWN ()) 0 '8') () 0 () ()
+() 2 6)
+62 'c_vertical_tab' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 1 1
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (
+CONSTANT (CHARACTER 1 1 1 UNKNOWN (())) 0 1 '\U0000000b') () 0 () () ()
+2 38)
+63 'cellml_model_definition' 'cellml_model_definition'
+'cellml_model_definition' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+64 'cellml_model_definition_call_rhs_routine' 'cellml_model_definition'
+'cellml_model_definition_call_rhs_routine_f' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL SUBROUTINE
+IS_BIND_C IS_C_INTEROP) (UNKNOWN 0 1 0 UNKNOWN ()) 65 0 (66 67 68 69 70
+71) () 0 () () () 0 0)
+72 'cellml_model_definition_get_initial_value' 'cellml_model_definition'
+'cellml_model_definition_get_initial_value_f' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C
+IS_C_INTEROP) (INTEGER 4 1 0 INTEGER ()) 73 0 (74 75 76) () 72 () () ()
+0 0)
+77 'cellml_model_definition_get_n_algebraic' 'cellml_model_definition'
+'cellml_model_definition_get_n_algebraic_f' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C IS_C_INTEROP) (
+INTEGER 4 1 0 INTEGER ()) 78 0 (79) () 77 () () () 0 0)
+80 'cellml_model_definition_get_n_constants' 'cellml_model_definition'
+'cellml_model_definition_get_n_constants_f' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C IS_C_INTEROP) (
+INTEGER 4 1 0 INTEGER ()) 81 0 (82) () 80 () () () 0 0)
+83 'cellml_model_definition_get_n_rates' 'cellml_model_definition'
+'cellml_model_definition_get_n_rates_f' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C IS_C_INTEROP) (
+INTEGER 4 1 0 INTEGER ()) 84 0 (85) () 83 () () () 0 0)
+86 'cellml_model_definition_get_save_temp_files' 'cellml_model_definition'
+'cellml_model_definition_get_save_temp_files_f' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C
+IS_C_INTEROP) (INTEGER 4 1 0 INTEGER ()) 87 0 (88) () 86 () () () 0 0)
+89 'cellml_model_definition_get_variable_index' 'cellml_model_definition'
+'cellml_model_definition_get_variable_index_f' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C
+IS_C_INTEROP) (INTEGER 4 1 0 INTEGER ()) 90 0 (91 92 93) () 89 () () ()
+0 0)
+94 'cellml_model_definition_get_variable_type' 'cellml_model_definition'
+'cellml_model_definition_get_variable_type_f' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C
+IS_C_INTEROP) (INTEGER 4 1 0 INTEGER ()) 95 0 (96 97 98) () 94 () () ()
+0 0)
+99 'cellml_model_definition_instantiate' 'cellml_model_definition'
+'cellml_model_definition_instantiate_f' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C IS_C_INTEROP) (
+INTEGER 4 1 0 INTEGER ()) 100 0 (101) () 99 () () () 0 0)
+102 'cellml_model_definition_set_save_temp_files'
+'cellml_model_definition' 'cellml_model_definition_set_save_temp_files_f'
+1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL
+SUBROUTINE IS_BIND_C IS_C_INTEROP) (UNKNOWN 0 1 0 UNKNOWN ()) 103 0 (
+104 105) () 0 () () () 0 0)
+106 'cellml_model_definition_set_variable_as_known'
+'cellml_model_definition'
+'cellml_model_definition_set_variable_as_known_f' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C
+IS_C_INTEROP) (INTEGER 4 1 0 INTEGER ()) 107 0 (108 109) () 106 () () ()
+0 0)
+110 'cellml_model_definition_set_variable_as_wanted'
+'cellml_model_definition'
+'cellml_model_definition_set_variable_as_wanted_f' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C
+IS_C_INTEROP) (INTEGER 4 1 0 INTEGER ()) 111 0 (112 113) () 110 () () ()
+0 0)
+114 'create_cellml_model_definition' 'cellml_model_definition'
+'create_cellml_model_definition_f' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL FUNCTION IS_BIND_C IS_C_INTEROP) (
+DERIVED 115 1 0 DERIVED ()) 116 0 (117) () 114 () () () 0 0)
+118 'destroy_cellml_model_definition' 'cellml_model_definition'
+'destroy_cellml_model_definition_f' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC BODY UNKNOWN 0 0 EXTERNAL SUBROUTINE IS_BIND_C IS_C_INTEROP)
+(UNKNOWN 0 1 0 UNKNOWN ()) 119 0 (120) () 0 () () () 0 0)
+16 'cptr' '__iso_c_binding' 'cptr' 15 ((DERIVED IN UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 49 0 0 DERIVED ()) 0 0 () () 0 () () ()
+0 0 0)
+17 'fptr' '__iso_c_binding' 'fptr' 15 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 POINTER DUMMY) (VOID 0 0 0 VOID ()) 0 0
+() () 0 () () () 0 0)
+18 'shape' '__iso_c_binding' 'shape' 15 ((VARIABLE IN UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 DIMENSION OPTIONAL DUMMY) (VOID 4 0 0 VOID ()) 0 0 ()
+(1 ASSUMED_SHAPE (CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () ()
+() 0 0)
+6 'c_ptr_1' '__iso_c_binding' 'c_ptr_1' 5 ((DERIVED IN UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 VALUE DUMMY) (DERIVED 49 0 0 DERIVED ()) 0 0 () () 0
+() () () 0 0 0)
+7 'c_ptr_2' '__iso_c_binding' 'c_ptr_2' 5 ((DERIVED IN UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 OPTIONAL VALUE DUMMY) (DERIVED 49 0 0 DERIVED ()) 0
+0 () () 0 () () () 0 0 0)
+21 'cptr' '__iso_c_binding' 'cptr' 20 ((DERIVED IN UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 27 0 0 DERIVED ()) 0 0 () () 0 () () ()
+0 0 0)
+22 'fptr' '__iso_c_binding' 'fptr' 20 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY PROC_POINTER) (VOID 0 0 0 VOID ())
+0 0 () () 0 () () () 0 0)
+117 'uri' '' 'uri' 116 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DIMENSION DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (1 ASSUMED_SIZE (CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+115 'c_ptr' '__iso_c_binding' '' 116 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 115 1 1 UNKNOWN ()) 0 0 () () 0 ((121 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+120 'model' '' 'model' 119 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 DUMMY) (DERIVED 122 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+74 'model' '' 'model' 73 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 123 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+75 'name' '' 'name' 73 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DIMENSION DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (1 ASSUMED_SIZE (CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+76 'value' '' 'value' 73 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DUMMY) (REAL 8 1 0 REAL ()) 0 0 () () 0 () () () 0 0)
+96 'model' '' 'model' 95 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 124 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+97 'name' '' 'name' 95 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DIMENSION DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (1 ASSUMED_SIZE (CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+98 'variable_type' '' 'variable_type' 95 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (INTEGER 4 1 0 INTEGER ()) 0 0 ()
+() 0 () () () 0 0)
+124 'c_ptr' '__iso_c_binding' '' 95 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 124 1 1 UNKNOWN ()) 0 0 () () 0 ((125 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+91 'model' '' 'model' 90 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 126 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+92 'name' '' 'name' 90 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DIMENSION DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (1 ASSUMED_SIZE (CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+93 'variable_index' '' 'variable_index' 90 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (INTEGER 4 1 0 INTEGER ()) 0 0 ()
+() 0 () () () 0 0)
+126 'c_ptr' '__iso_c_binding' '' 90 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 126 1 1 UNKNOWN ()) 0 0 () () 0 ((127 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+108 'model' '' 'model' 107 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 VALUE DUMMY) (DERIVED 128 0 0 DERIVED ()) 0 0 () ()
+0 () () () 0 0)
+109 'name' '' 'name' 107 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DIMENSION DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (1 ASSUMED_SIZE (CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+112 'model' '' 'model' 111 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 VALUE DUMMY) (DERIVED 129 0 0 DERIVED ()) 0 0 () ()
+0 () () () 0 0)
+113 'name' '' 'name' 111 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DIMENSION DUMMY) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1'))) 0 0 () (1 ASSUMED_SIZE (CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+129 'c_ptr' '__iso_c_binding' '' 111 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 129 1 1 UNKNOWN ()) 0 0 () () 0 ((130 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+104 'model' '' 'model' 103 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 VALUE DUMMY) (DERIVED 131 0 0 DERIVED ()) 0 0 () ()
+0 () () () 0 0)
+105 'state' '' 'state' 103 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 VALUE DUMMY) (INTEGER 4 1 0 INTEGER ()) 0 0 () () 0
+() () () 0 0)
+85 'model' '' 'model' 84 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 132 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+79 'model' '' 'model' 78 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 133 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+66 'model' '' 'model' 65 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 134 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+67 'voi' '' 'voi' 65 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (REAL 8 1 0 REAL ()) 0 0 () () 0 () () () 0 0)
+68 'states' '' 'states' 65 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 DIMENSION DUMMY) (REAL 8 1 0 REAL ()) 0 0 () (1
+ASSUMED_SIZE (CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () ()
+0 0)
+69 'rates' '' 'rates' 65 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DIMENSION DUMMY) (REAL 8 1 0 REAL ()) 0 0 () (1 ASSUMED_SIZE
+(CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+70 'wanted' '' 'wanted' 65 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 DIMENSION DUMMY) (REAL 8 1 0 REAL ()) 0 0 () (1
+ASSUMED_SIZE (CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () ()
+0 0)
+71 'known' '' 'known' 65 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DIMENSION DUMMY) (REAL 8 1 0 REAL ()) 0 0 () (1 ASSUMED_SIZE
+(CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+122 'c_ptr' '__iso_c_binding' '' 119 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 122 1 1 UNKNOWN ()) 0 0 () () 0 ((135 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+123 'c_ptr' '__iso_c_binding' '' 73 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 123 1 1 UNKNOWN ()) 0 0 () () 0 ((136 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+128 'c_ptr' '__iso_c_binding' '' 107 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 128 1 1 UNKNOWN ()) 0 0 () () 0 ((137 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+131 'c_ptr' '__iso_c_binding' '' 103 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 131 1 1 UNKNOWN ()) 0 0 () () 0 ((138 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+88 'model' '' 'model' 87 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 139 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+139 'c_ptr' '__iso_c_binding' '' 87 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 139 1 1 UNKNOWN ()) 0 0 () () 0 ((140 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+101 'model' '' 'model' 100 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 VALUE DUMMY) (DERIVED 141 0 0 DERIVED ()) 0 0 () ()
+0 () () () 0 0)
+141 'c_ptr' '__iso_c_binding' '' 100 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 141 1 1 UNKNOWN ()) 0 0 () () 0 ((142 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+82 'model' '' 'model' 81 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 VALUE DUMMY) (DERIVED 143 0 0 DERIVED ()) 0 0 () () 0 () ()
+() 0 0)
+132 'c_ptr' '__iso_c_binding' '' 84 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 132 1 1 UNKNOWN ()) 0 0 () () 0 ((144 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+133 'c_ptr' '__iso_c_binding' '' 78 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 133 1 1 UNKNOWN ()) 0 0 () () 0 ((145 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+134 'c_ptr' '__iso_c_binding' '' 65 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 134 1 1 UNKNOWN ()) 0 0 () () 0 ((146 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+143 'c_ptr' '__iso_c_binding' '' 81 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_BIND_C IS_C_INTEROP IS_ISO_C) (
+DERIVED 143 1 1 UNKNOWN ()) 0 0 () () 0 ((147 '__c_ptr_c_address' (
+INTEGER 8 1 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ())) UNKNOWN-ACCESS () () 2 39 0)
+)
+
+('__iso_c_binding' 0 2 'c_alert' 0 3 'c_associated' 0 4 'c_backspace' 0
+8 'c_bool' 0 9 'c_carriage_return' 0 10 'c_char' 0 11 'c_double' 0 12
+'c_double_complex' 0 13 'c_f_pointer' 0 14 'c_f_procpointer' 0 19
+'c_float' 0 23 'c_float_complex' 0 24 'c_form_feed' 0 25 'c_funloc' 0 26
+'c_funptr' 0 27 'c_horizontal_tab' 0 29 'c_int' 0 30 'c_int128_t' 0 31
+'c_int16_t' 0 32 'c_int32_t' 0 33 'c_int64_t' 0 34 'c_int8_t' 0 35
+'c_int_fast128_t' 0 36 'c_int_fast16_t' 0 37 'c_int_fast32_t' 0 38
+'c_int_fast64_t' 0 39 'c_int_fast8_t' 0 40 'c_int_least128_t' 0 41
+'c_int_least16_t' 0 42 'c_int_least32_t' 0 43 'c_int_least64_t' 0 44
+'c_int_least8_t' 0 45 'c_intmax_t' 0 46 'c_intptr_t' 0 47 'c_loc' 0 48
+'c_long' 0 50 'c_long_double' 0 51 'c_long_double_complex' 0 52
+'c_long_long' 0 53 'c_new_line' 0 54 'c_null_char' 0 55 'c_null_funptr'
+0 56 'c_null_ptr' 0 57 'c_ptr' 0 49 'c_short' 0 59 'c_signed_char' 0 60
+'c_size_t' 0 61 'c_vertical_tab' 0 62 'cellml_model_definition' 0 63
+'cellml_model_definition_call_rhs_routine' 0 64
+'cellml_model_definition_get_initial_value' 0 72
+'cellml_model_definition_get_n_algebraic' 0 77
+'cellml_model_definition_get_n_constants' 0 80
+'cellml_model_definition_get_n_rates' 0 83
+'cellml_model_definition_get_save_temp_files' 0 86
+'cellml_model_definition_get_variable_index' 0 89
+'cellml_model_definition_get_variable_type' 0 94
+'cellml_model_definition_instantiate' 0 99
+'cellml_model_definition_set_save_temp_files' 0 102
+'cellml_model_definition_set_variable_as_known' 0 106
+'cellml_model_definition_set_variable_as_wanted' 0 110
+'create_cellml_model_definition' 0 114 'destroy_cellml_model_definition'
+0 118)
