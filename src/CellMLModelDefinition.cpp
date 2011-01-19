@@ -69,6 +69,7 @@ CellMLModelDefinition::CellMLModelDefinition()
   nConstants = -1;
   mNumberOfWantedVariables = 0;
   mNumberOfKnownVariables = 0;
+  mNumberOfIndependentVariables = 0;
   mStateCounter = 0;
   mIntermediateCounter = 0;
   mParameterCounter = 0;
@@ -93,6 +94,7 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   nConstants = -1;
   mNumberOfWantedVariables = 0;
   mNumberOfKnownVariables = 0;
+  mNumberOfIndependentVariables = 0;
   mStateCounter = 0;
   mIntermediateCounter = 0;
   mParameterCounter = 0;
@@ -139,21 +141,20 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
           if (ct == NULL) break;
           if (ct->type() == iface::cellml_services::STATE_VARIABLE)
           {
-            as->setStringAnnotation(ct->variable(),L"flag",L"WANTED");
+            as->setStringAnnotation(ct->variable(),L"flag",L"STATE");
             as->setStringAnnotation(ct->variable(),L"array",L"OC_STATE");
             as->setStringAnnotation(ct->variable(),L"array_index",formatNumber(mStateCounter).c_str());
             mStateCounter++;
-            mNumberOfWantedVariables++;
           }
           else if (ct->type() == iface::cellml_services::VARIABLE_OF_INTEGRATION)
           {
-            as->setStringAnnotation(ct->variable(),L"flag",L"KNOWN");
-            mNumberOfKnownVariables++;
+            as->setStringAnnotation(ct->variable(),L"flag",L"INDEPENDENT");
+            mNumberOfIndependentVariables++;
           }
           else if (ct->degree() > 0)
           {
-            as->setStringAnnotation(ct->variable(),L"flag-degree",L"WANTED");
-            mNumberOfWantedVariables++;
+            //as->setStringAnnotation(ct->variable(),L"flag-degree",L"WANTED");
+            //mNumberOfWantedVariables++;
           }
         }
       }
@@ -250,6 +251,89 @@ int CellMLModelDefinition::getInitialValue(const char* name,double* value)
   {
     std::cerr << "CellMLModelDefinition::getInitialValue -- variable " << name << " has no initial value." << std::endl;
     code = -4;
+  }
+  return code;
+}
+
+int CellMLModelDefinition::getVariableType(const char* name,int* type)
+{
+  int StateType = 1;
+  int KnownType = 2;
+  int WantedType = 3;
+  int IndependentType = 4;
+  int code = -1;
+  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
+  if (!model && !mCodeInformation && !mAnnotations)
+  {
+    std::cerr << "CellMLModelDefinition::getVariableType -- missing model?" << std::endl;
+    return -2;
+  }
+  RETURN_INTO_OBJREF(var,iface::cellml_api::CellMLVariable,findLocalVariable(model,name));
+  if (!var)
+  {
+    std::cerr << "CellMLModelDefinition::getVariableType -- unable to find named variable: " << name << std::endl;
+    return -3;
+  }
+  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(mAnnotations);
+  RETURN_INTO_WSTRING(flag,as->getStringAnnotation(var,L"flag"));
+  if (!flag.empty())
+  {
+    code = 0;
+    if (flag == L"STATE") *type = StateType;
+    else if (flag == L"KNOWN") *type = KnownType;
+    else if (flag == L"WANTED") *type = WantedType;
+    else if (flag == L"INDEPENDENT") *type = IndependentType;
+    else
+    {
+      std::cerr << "CellMLModelDefinition::getVariableType -- variable: " << name << "; has an unknown type: ";
+      std::wcerr << flag.c_str();
+      std::cerr << std::endl;
+      code = -5;
+    }
+  }
+  else
+  {
+    std::cerr << "CellMLModelDefinition::getVariableType -- unable to find named variable's type: " << name << std::endl;
+    return -4;
+  }
+  return code;
+}
+
+int CellMLModelDefinition::getVariableIndex(const char* name,int* index)
+{
+  int code = -1;
+  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
+  if (!model && !mCodeInformation && !mAnnotations)
+  {
+    std::cerr << "CellMLModelDefinition::getVariableIndex -- missing model?" << std::endl;
+    return -2;
+  }
+  RETURN_INTO_OBJREF(var,iface::cellml_api::CellMLVariable,findLocalVariable(model,name));
+  if (!var)
+  {
+    std::cerr << "CellMLModelDefinition::getVariableIndex -- unable to find named variable: " << name << std::endl;
+    return -3;
+  }
+  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(mAnnotations);
+  RETURN_INTO_WSTRING(str,as->getStringAnnotation(var,L"array_index"));
+  if (!str.empty())
+  {
+    code = 0;
+    wchar_t* tail = NULL;
+    int i = wcstol(str.c_str(),&tail,/*base 10*/10);
+    if (tail != str.c_str()) *index = i;
+    else
+    {
+      std::cerr << "CellMLModelDefinition::getVariableIndex -- variable: " << name << "; has an invalid index: ";
+      std::wcerr << str.c_str();
+      std::cerr << std::endl;
+      code = -5;
+    }
+  }
+  else
+  {
+    std::cerr << "CellMLModelDefinition::getVariableIndex -- unable to find named variable's index: " << name << std::endl;
+    return -4;
   }
   return code;
 }
@@ -354,7 +438,8 @@ int CellMLModelDefinition::setVariableAsKnown(const char* name)
 int CellMLModelDefinition::setVariableAsWanted(const char* name)
 {
   std::vector<iface::cellml_services::VariableEvaluationType> vets;
-  vets.push_back(iface::cellml_services::STATE_VARIABLE);
+  // can't flag state variables
+  //vets.push_back(iface::cellml_services::STATE_VARIABLE);
   vets.push_back(iface::cellml_services::PSEUDOSTATE_VARIABLE);
   vets.push_back(iface::cellml_services::ALGEBRAIC);
   //vets.push_back(iface::cellml_services::LOCALLY_BOUND);

@@ -76,6 +76,38 @@ int cellml_model_definition_get_initial_value_f(void* _ptr,const char* name,doub
   return return_code;
 }
 
+int cellml_model_definition_get_variable_type_f(void* _ptr,const char* name,int* variable_type)
+{
+  int return_code = -1;
+  CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
+  if (_ptr && (def = (CellMLModelDefinition*)_ptr))
+  {
+    return_code = def->getVariableType(name,variable_type);
+  }
+  else
+  {
+    std::cerr << "[cellml_model_definition_get_variable_type_f] "
+        << "Invalid arguments." << std::endl;
+  }
+  return return_code;
+}
+
+int cellml_model_definition_get_variable_index_f(void* _ptr,const char* name,int* variable_index)
+{
+  int return_code = -1;
+  CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
+  if (_ptr && (def = (CellMLModelDefinition*)_ptr))
+  {
+    return_code = def->getVariableIndex(name,variable_index);
+  }
+  else
+  {
+    std::cerr << "[cellml_model_definition_get_variable_index_f] "
+        << "Invalid arguments." << std::endl;
+  }
+  return return_code;
+}
+
 int cellml_model_definition_set_variable_as_known_f(void* _ptr,const char* name)
 {
   int return_code = -1;

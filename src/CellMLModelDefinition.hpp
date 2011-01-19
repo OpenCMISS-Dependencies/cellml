@@ -38,6 +38,24 @@ class CellMLModelDefinition
   int getInitialValue(const char* name,double* value);
 
   /**
+   * Get the current type of the specified variable.
+   * @param name The name of the model variable to get the type of. This string should be in the
+   * format of 'component_name/variable_name'.
+   * @param type On successful exit, will be the type of the named variable; otherwise uninitialised. State=1, known=2, wanted=3, independent=4?
+   * @return zero if no error occured; otherwise non-zero to indicate and error occured and variable_type is not set.
+   */
+  int getVariableType(const char* name,int* type);
+
+  /**
+   * Get the current index of the specified variable. C-style index will be returned (starting from 0).
+   * @param name The name of the model variable to get the index of. This string
+   * should be in the format of 'component_name/variable_name'.
+   * @param index On successful exit, will be the C index of the named variable; otherwise uninitialised.
+   * @return zero if no error occured; otherwise non-zero to indicate and error occured and variable_index is not set.
+   */
+  int getVariableIndex(const char* name,int* index);
+
+  /**
    * Flag the specified variable as being 'known' for the purposes of code generation. This implies
    * that the variable will have its value set externally to the CellML model.
    * @param name The name of the model variable to flag. This string should be in the format of 'component_name/variable_name'.
@@ -140,6 +158,7 @@ class CellMLModelDefinition
   void* mAnnotations;
   int mNumberOfWantedVariables;
   int mNumberOfKnownVariables;
+  int mNumberOfIndependentVariables;
   int mStateCounter;
   int mIntermediateCounter;
   int mParameterCounter;

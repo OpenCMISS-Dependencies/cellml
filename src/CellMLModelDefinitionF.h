@@ -30,6 +30,26 @@ extern "C"
   int cellml_model_definition_get_initial_value_f(void* model,const char* name,double* value);
 
   /**
+   * Get the current type of the specified variable.
+   * @param model An existing CellML model definition object.
+   * @param name NULL-terminated string containing the name of the model variable to get the type of. This string
+   * should be in the format of 'component_name/variable_name'.
+   * @param variable_type On successful exit, will be the type of the named variable; otherwise uninitialised. State=1, known=2, wanted=3, independent=4?
+   * @return zero if no error occured; otherwise non-zero to indicate and error occured and variable_type is not set.
+   */
+  int cellml_model_definition_get_variable_type_f(void* model,const char* name,int* variable_type);
+
+  /**
+   * Get the current index of the specified variable. A C-style index will be returned (i.e., starting from 0).
+   * @param model An existing CellML model definition object.
+   * @param name NULL-terminated string containing the name of the model variable to get the index of. This string
+   * should be in the format of 'component_name/variable_name'.
+   * @param variable_index On successful exit, will be the index of the named variable; otherwise uninitialised.
+   * @return zero if no error occured; otherwise non-zero to indicate and error occured and variable_index is not set.
+   */
+  int cellml_model_definition_get_variable_index_f(void* model,const char* name,int* variable_index);
+
+  /**
    * Flag the specified variable as being 'known' for the purposes of code generation. This implies
    * that the variable will have its value set externally to the CellML model.
    * @param model An existing CellML model definition object.
