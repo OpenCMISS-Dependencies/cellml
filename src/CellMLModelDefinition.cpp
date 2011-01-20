@@ -35,6 +35,8 @@
 typedef std::pair<std::string,std::string> CVpair;
 static CVpair splitName(const char* s);
 static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::Model* model,const char* name);
+static iface::cellml_api::CellMLVariable* findVariable(iface::cellml_api::Model* model,void* _annotations,
+    const int type,const int index);
 
 static std::wstring formatNumber(const int value)
 {
@@ -250,6 +252,48 @@ int CellMLModelDefinition::getInitialValue(const char* name,double* value)
   else
   {
     std::cerr << "CellMLModelDefinition::getInitialValue -- variable " << name << " has no initial value." << std::endl;
+    code = -4;
+  }
+  return code;
+}
+
+int CellMLModelDefinition::getInitialValueByIndex(const int type,const int index,double* value)
+{
+  int code = -1;
+  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
+  if (!model)
+  {
+    std::cerr << "CellMLModelDefinition::getInitialValueByIndex -- missing model?" << std::endl;
+    return -2;
+  }
+  RETURN_INTO_OBJREF(var,iface::cellml_api::CellMLVariable,findVariable(model,mAnnotations,type,index));
+  if (!var)
+  {
+    std::cerr << "CellMLModelDefinition::getInitialValueByIndex -- unable to find variable: " << index
+        << "; of type: " << type << std::endl;
+    return -3;
+  }
+  RETURN_INTO_WSTRING(iv,var->initialValue());
+  if (iv != L"")
+  {
+    wchar_t* end;
+    double v = wcstod(iv.c_str(),&end);
+    if (end == NULL || *end != 0)
+    {
+      std::wcerr << "CellMLModelDefinition::getInitialValueByIndex -- variable: " << index << "; of type:"
+          << type << "; has non-numeric initial value: " << iv.c_str() << std::endl;
+      code = -5;
+    }
+    else
+    {
+      *value = v;
+      code = 0;
+    }
+  }
+  else
+  {
+    std::cerr << "CellMLModelDefinition::getInitialValueByIndex -- variable: " << index << "; of type:"
+        << type << "; has no initial value." << std::endl;
     code = -4;
   }
   return code;
@@ -580,6 +624,64 @@ static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::M
     std::cerr << "CellMLModelDefinition::findLocalVariable -- unable get source variable for variable: "
         << cv.first.c_str() << " / " << cv.second.c_str() << std::endl;
     return NULL;
+  }
+  return v;
+}
+
+static iface::cellml_api::CellMLVariable* findVariable(iface::cellml_api::Model* model,void* _annotations,
+    const int type,const int index)
+{
+  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(_annotations);
+  iface::cellml_api::CellMLVariable* v = NULL;
+  // search source variables of all variables from local variables for matching type/index
+  RETURN_INTO_OBJREF(components,iface::cellml_api::CellMLComponentSet,model->localComponents());
+  RETURN_INTO_OBJREF(ci,iface::cellml_api::CellMLComponentIterator,components->iterateComponents());
+  bool typeMatch = false;
+  bool indexMatch = false;
+  while(true)
+  {
+    RETURN_INTO_OBJREF(c,iface::cellml_api::CellMLComponent,ci->nextComponent());
+    if (c == NULL) break;
+    RETURN_INTO_OBJREF(variables,iface::cellml_api::CellMLVariableSet,c->variables());
+    RETURN_INTO_OBJREF(vi,iface::cellml_api::CellMLVariableIterator,variables->iterateVariables());
+    while(true)
+    {
+      typeMatch = false;
+      indexMatch = false;
+      RETURN_INTO_OBJREF(variable,iface::cellml_api::CellMLVariable,vi->nextVariable());
+      if (variable == NULL) break;
+      RETURN_INTO_WSTRING(vname,variable->name());
+      v = variable->sourceVariable();
+      RETURN_INTO_WSTRING(svname,v->name());
+      if (v)
+      {
+        RETURN_INTO_WSTRING(flag,as->getStringAnnotation(v,L"flag"));
+        if (!flag.empty())
+        {
+          if ((flag == L"STATE") && (type == 1)) typeMatch = true;
+          else if ((flag == L"KNOWN") && (type == 2)) typeMatch = true;
+          else if ((flag == L"WANTED") && (type == 3)) typeMatch = true;
+          else if ((flag == L"INDEPENDENT") && (type == 4)) typeMatch = true;
+        }
+        RETURN_INTO_WSTRING(str,as->getStringAnnotation(v,L"array_index"));
+        if (!str.empty())
+        {
+          wchar_t* tail = NULL;
+          int i = wcstol(str.c_str(),&tail,/*base 10*/10);
+          if (tail != str.c_str())
+          {
+            if (i == index) indexMatch = true;
+          }
+        }
+      }
+      if (typeMatch && indexMatch) break;
+    }
+    if (typeMatch && indexMatch) break;
+  }
+  if (!(typeMatch && indexMatch))
+  {
+    v->release_ref();
+    v = NULL;
   }
   return v;
 }

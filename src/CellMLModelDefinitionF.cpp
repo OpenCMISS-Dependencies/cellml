@@ -76,6 +76,24 @@ int cellml_model_definition_get_initial_value_f(void* _ptr,const char* name,doub
   return return_code;
 }
 
+int cellml_model_definition_get_initial_value_by_index_f(void* _ptr,const int* const type,const int* const index,double* value)
+{
+  int return_code = -1;
+  CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
+  if ((*type > 0) && (*index > 0) && _ptr && (def = (CellMLModelDefinition*)_ptr))
+  {
+    // need to map from 0-indexed C arrays to 1-indexed Fortran arrays
+    int i = (*index)-1;
+    return_code = def->getInitialValueByIndex((*type),i,value);
+  }
+  else
+  {
+    std::cerr << "[cellml_model_definition_get_initial_value_by_index_f] "
+        << "Invalid arguments. " << *type << " " << *index << std::endl;
+  }
+  return return_code;
+}
+
 int cellml_model_definition_get_variable_type_f(void* _ptr,const char* name,int* variable_type)
 {
   int return_code = -1;
@@ -99,6 +117,8 @@ int cellml_model_definition_get_variable_index_f(void* _ptr,const char* name,int
   if (_ptr && (def = (CellMLModelDefinition*)_ptr))
   {
     return_code = def->getVariableIndex(name,variable_index);
+    // need to map from 0-indexed C arrays to 1-indexed Fortran arrays
+    if (return_code == 0) (*variable_index) += 1;
   }
   else
   {

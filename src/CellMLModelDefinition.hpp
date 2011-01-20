@@ -38,6 +38,20 @@ class CellMLModelDefinition
   int getInitialValue(const char* name,double* value);
 
   /**
+   * Get the initial value (if specified) of the index'th variable of the given type.
+   * Will search the local components of this model for a variable flagged with the specified type and assigned the
+   * specified index. If that variable (or its corresponding source variable) has an initial value, return that value.
+   * \todo Really need to look at using the evaluation type constant to do this, as it is possible to assign initial
+   * values and parameters using 'x = value' type equations.
+   * @param type The type of the variable to look for.
+   * @param index The index of the variable to look for (this is the index of the variable in the array that corresponds
+   * to the given type.
+   * @param value On successful exit, will be the initial value of the found variable; otherwise uninitialised.
+   * @return zero if no error occured; otherwise non-zero to indicate and error occured and value is not set.
+   */
+  int getInitialValueByIndex(const int type,const int index,double* value);
+
+  /**
    * Get the current type of the specified variable.
    * @param name The name of the model variable to get the type of. This string should be in the
    * format of 'component_name/variable_name'.
