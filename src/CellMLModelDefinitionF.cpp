@@ -116,6 +116,7 @@ int cellml_model_definition_get_variable_index_f(void* _ptr,const char* name,int
   CellMLModelDefinition* def = (CellMLModelDefinition*)NULL;
   if (_ptr && (def = (CellMLModelDefinition*)_ptr))
   {
+    std::cout << "getting index of variable: '" << name << "'" << std::endl;
     return_code = def->getVariableIndex(name,variable_index);
     // need to map from 0-indexed C arrays to 1-indexed Fortran arrays
     if (return_code == 0) (*variable_index) += 1;

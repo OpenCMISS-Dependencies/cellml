@@ -461,6 +461,34 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
   {
     std::cerr << "CellMLModelDefinition::flagVariable -- computation target for variable: "
         << name << "; is the wrong type to be flagged" << std::endl;
+    std::cerr << "Computation target for this source variable is: ";
+    switch (ct->type())
+    {
+    case iface::cellml_services::CONSTANT:
+      std::cerr << "CONSTANT";
+      break;
+    case iface::cellml_services::VARIABLE_OF_INTEGRATION:
+      std::cerr << "VARIABLE_OF_INTEGRATION";
+      break;
+    case iface::cellml_services::STATE_VARIABLE:
+      std::cerr << "STATE_VARIABLE";
+      break;
+    case iface::cellml_services::PSEUDOSTATE_VARIABLE:
+      std::cerr << "PSEUDOSTATE_VARIABLE";
+      break;
+    case iface::cellml_services::ALGEBRAIC:
+      std::cerr << "ALGEBRAIC";
+      break;
+    case iface::cellml_services::LOCALLY_BOUND:
+      std::cerr << "LOCALLY_BOUND";
+      break;
+    case iface::cellml_services::FLOATING:
+      std::cerr << "FLOATING";
+      break;
+    default:
+      std::cerr << "Invalid";
+    }
+    std::cerr << std::endl;
     ct->release_ref();
     return -5;
   }
@@ -487,6 +515,9 @@ int CellMLModelDefinition::setVariableAsWanted(const char* name)
   vets.push_back(iface::cellml_services::PSEUDOSTATE_VARIABLE);
   vets.push_back(iface::cellml_services::ALGEBRAIC);
   //vets.push_back(iface::cellml_services::LOCALLY_BOUND);
+  // we need to allow constant variables to be flagged as wanted since if it is a model with no
+  // differential equations then all algebraic variables will be constant - i.e., constitutive laws
+  vets.push_back(iface::cellml_services::CONSTANT);
   int code = flagVariable(this,name,L"WANTED",vets,mNumberOfWantedVariables,mIntermediateCounter);
   return code;
 }
