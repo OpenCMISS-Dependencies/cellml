@@ -9,12 +9,11 @@ include Makefile.common
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
-
 CMAKE_OPTIONS =
 CMAKE_OPTIONS += -DCMAKE_INCLUDE_PATH=$(CDA_DIR)/include
-CMAKE_OPTIONS += -DCMAKE_INCLUDE_PATH=$(COMMON_DIR)/include
+#CMAKE_OPTIONS += -DCMAKE_INCLUDE_PATH=$(COMMON_DIR)/lib
 CMAKE_OPTIONS += -DCMAKE_LIBRARY_PATH=$(CDA_DIR)/lib
-CMAKE_OPTIONS += -DCMAKE_LIBRARY_PATH=$(COMMON_DIR)/lib
+#CMAKE_OPTIONS += -DCMAKE_LIBRARY_PATH=$(COMMON_DIR)/lib
 CMAKE_OPTIONS += -DCMAKE_INSTALL_PREFIX=$(LIBOCCELLML_INSTALL_DIR)
 
 ifeq ($(DEBUG),true)
@@ -31,15 +30,15 @@ ifeq ($(OPERATING_SYSTEM),linux)
     CMAKE_ENV += CC=gcc
     CMAKE_ENV += CXX=g++
     ifeq ($(ABI),32)
-      CMAKE_ENV += CFLAGS="-m32 -fPIC"
-      CMAKE_ENV += CXXFLAGS="-m32 -fPIC"
-      CMAKE_ENV += FFLAGS="-m32 -fPIC"
-      CMAKE_ENV += LDFLAGS="-m32 -fPIC"
+      CMAKE_ENV += CFLAGS="-m32"
+      CMAKE_ENV += CXXFLAGS="-m32"
+      CMAKE_ENV += FFLAGS="-m32"
+      CMAKE_ENV += LDFLAGS="-m32"
     else
-      CMAKE_ENV += CFLAGS="-m64 -fPIC"
-      CMAKE_ENV += CXXFLAGS="-m64 -fPIC"
-      CMAKE_ENV += FFLAGS="-m64 -fPIC"
-      CMAKE_ENV += LDFLAGS="-m64 -fPIC"
+      CMAKE_ENV += CFLAGS="-m64"
+      CMAKE_ENV += CXXFLAGS="-m64"
+      CMAKE_ENV += FFLAGS="-m64"
+      CMAKE_ENV += LDFLAGS="-m64"
     endif
   else
     ifeq ($(COMPILER),ibm)
@@ -63,15 +62,15 @@ ifeq ($(OPERATING_SYSTEM),linux)
         CMAKE_ENV += CC=icc
         CMAKE_ENV += CXX=icpc
         ifeq ($(ABI),32)
-          CMAKE_ENV += CFLAGS="-m32 -fPIC"
-          CMAKE_ENV += CXXFLAGS="-m32 -fPIC"
-          CMAKE_ENV += FFLAGS="-m32 -fPIC"
-          CMAKE_ENV += LDFLAGS="-m32 -fPIC"
+          CMAKE_ENV += CFLAGS="-m32"
+          CMAKE_ENV += CXXFLAGS="-m32"
+          CMAKE_ENV += FFLAGS="-m32"
+          CMAKE_ENV += LDFLAGS="-m32"
         else
-          CMAKE_ENV += CFLAGS="-m64 -fPIC"
-          CMAKE_ENV += CXXFLAGS="-m64 -fPIC"
-          CMAKE_ENV += FFLAGS="-m64 -fPIC"
-          CMAKE_ENV += LDFLAGS="-m64 -fPIC"
+          CMAKE_ENV += CFLAGS="-m64"
+          CMAKE_ENV += CXXFLAGS="-m64"
+          CMAKE_ENV += FFLAGS="-m64"
+          CMAKE_ENV += LDFLAGS="-m64"
         endif
        else
         $(error invalid COMPILER specification)
@@ -85,7 +84,7 @@ main: preliminaries \
 	$(occellml_build)
 
 occellml_build_linux:
-	( cd $(LIBOCCELLML_BUILD_DIR) && $(CMAKE_ENV) cmake $(CMAKE_OPTIONS) $(CURDIR) > build.log 2>&1 )
+	( cd $(LIBOCCELLML_BUILD_DIR) && $(CMAKE_ENV) cmake --debug-output $(CMAKE_OPTIONS) $(CURDIR) > build.log 2>&1 )
 	( cd $(LIBOCCELLML_BUILD_DIR) && make >> build.log 2>&1 )
 	( cd $(LIBOCCELLML_BUILD_DIR) && make install >> build.log 2>&1 )
 
