@@ -29,15 +29,15 @@ ifeq ($(OPERATING_SYSTEM),linux)
     CMAKE_ENV += CC=gcc
     CMAKE_ENV += CXX=g++
     ifeq ($(ABI),32)
-      CMAKE_ENV += CFLAGS="-m32"
-      CMAKE_ENV += CXXFLAGS="-m32"
-      CMAKE_ENV += FFLAGS="-m32"
-      CMAKE_ENV += LDFLAGS="-m32"
+      CMAKE_ENV += CFLAGS="-m32 -fPIC"
+      CMAKE_ENV += CXXFLAGS="-m32 -fPIC"
+      CMAKE_ENV += FFLAGS="-m32 -fPIC"
+      CMAKE_ENV += LDFLAGS="-m32 -fPIC"
     else
-      CMAKE_ENV += CFLAGS="-m64"
-      CMAKE_ENV += CXXFLAGS="-m64"
-      CMAKE_ENV += FFLAGS="-m64"
-      CMAKE_ENV += LDFLAGS="-m64"
+      CMAKE_ENV += CFLAGS="-m64 -fPIC"
+      CMAKE_ENV += CXXFLAGS="-m64 -fPIC"
+      CMAKE_ENV += FFLAGS="-m64 -fPIC"
+      CMAKE_ENV += LDFLAGS="-m64 -fPIC"
     endif
   else
     ifeq ($(COMPILER),ibm)
@@ -61,15 +61,15 @@ ifeq ($(OPERATING_SYSTEM),linux)
         CMAKE_ENV += CC=icc
         CMAKE_ENV += CXX=icpc
         ifeq ($(ABI),32)
-          CMAKE_ENV += CFLAGS="-m32"
-          CMAKE_ENV += CXXFLAGS="-m32"
-          CMAKE_ENV += FFLAGS="-m32"
-          CMAKE_ENV += LDFLAGS="-m32"
+          CMAKE_ENV += CFLAGS="-m32 -fPIC"
+          CMAKE_ENV += CXXFLAGS="-m32 -fPIC"
+          CMAKE_ENV += FFLAGS="-m32 -fPIC"
+          CMAKE_ENV += LDFLAGS="-m32 -fPIC"
         else
-          CMAKE_ENV += CFLAGS="-m64"
-          CMAKE_ENV += CXXFLAGS="-m64"
-          CMAKE_ENV += FFLAGS="-m64"
-          CMAKE_ENV += LDFLAGS="-m64"
+          CMAKE_ENV += CFLAGS="-m64 -fPIC"
+          CMAKE_ENV += CXXFLAGS="-m64 -fPIC"
+          CMAKE_ENV += FFLAGS="-m64 -fPIC"
+          CMAKE_ENV += LDFLAGS="-m64 -fPIC"
         endif
        else
         $(error invalid COMPILER specification)
