@@ -9,12 +9,11 @@ include Makefile.common
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
-
 CMAKE_OPTIONS =
 CMAKE_OPTIONS += -DCMAKE_INCLUDE_PATH=$(CDA_DIR)/include
-CMAKE_OPTIONS += -DCMAKE_INCLUDE_PATH=$(COMMON_DIR)/include
+#CMAKE_OPTIONS += -DCMAKE_INCLUDE_PATH=$(COMMON_DIR)/lib
 CMAKE_OPTIONS += -DCMAKE_LIBRARY_PATH=$(CDA_DIR)/lib
-CMAKE_OPTIONS += -DCMAKE_LIBRARY_PATH=$(COMMON_DIR)/lib
+#CMAKE_OPTIONS += -DCMAKE_LIBRARY_PATH=$(COMMON_DIR)/lib
 CMAKE_OPTIONS += -DCMAKE_INSTALL_PREFIX=$(LIBOCCELLML_INSTALL_DIR)
 
 ifeq ($(DEBUG),true)
@@ -85,7 +84,7 @@ main: preliminaries \
 	$(occellml_build)
 
 occellml_build_linux:
-	( cd $(LIBOCCELLML_BUILD_DIR) && $(CMAKE_ENV) cmake $(CMAKE_OPTIONS) $(CURDIR) > build.log 2>&1 )
+	( cd $(LIBOCCELLML_BUILD_DIR) && $(CMAKE_ENV) cmake --debug-output $(CMAKE_OPTIONS) $(CURDIR) > build.log 2>&1 )
 	( cd $(LIBOCCELLML_BUILD_DIR) && make >> build.log 2>&1 )
 	( cd $(LIBOCCELLML_BUILD_DIR) && make install >> build.log 2>&1 )
 

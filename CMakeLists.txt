@@ -15,7 +15,7 @@ FIND_PACKAGE(LibXml2 REQUIRED QUIET)
 # Probably better to not do this as it probably overrides and external value?
 IF( MSVC )
     ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600 )
-ELSE (MSVC )
+ELSE ( MSVC )
     # allow dynamic compilation
     ADD_DEFINITIONS(-DDYNAMIC_COMPILE)
     SET (CMAKE_CXX_FLAGS "-Wall -Werror -fPIC ${LIBXML2_DEFINITIONS}")
