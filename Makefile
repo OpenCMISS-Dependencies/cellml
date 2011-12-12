@@ -10,10 +10,7 @@ include Makefile.common
 #----------------------------------------------------------------------------------------------------------------------------------
 
 CMAKE_OPTIONS =
-CMAKE_OPTIONS += -DCMAKE_INCLUDE_PATH=$(CDA_DIR)/include
-#CMAKE_OPTIONS += -DCMAKE_INCLUDE_PATH=$(COMMON_DIR)/lib
-CMAKE_OPTIONS += -DCMAKE_LIBRARY_PATH=$(CDA_DIR)/lib
-#CMAKE_OPTIONS += -DCMAKE_LIBRARY_PATH=$(COMMON_DIR)/lib
+CMAKE_OPTIONS += -DCMAKE_PREFIX_PATH="$(CDA_DIR);$(COMMON_DIR)"
 CMAKE_OPTIONS += -DCMAKE_INSTALL_PREFIX=$(LIBOCCELLML_INSTALL_DIR)
 
 ifeq ($(DEBUG),true)
