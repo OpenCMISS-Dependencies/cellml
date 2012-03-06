@@ -25,9 +25,9 @@
 #include <CellMLBootstrap.hpp>
 #include <IfaceAnnoTools.hxx>
 #include <AnnoToolsBootstrap.hpp>
+#include <cellml-api-cxx-support.hpp>
 
 #include "CellMLModelDefinition.hpp"
-#include "utils.hxx"
 
 /*
  * Prototype local methods
@@ -1010,8 +1010,8 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
     cg->useCeVAS(cevas);
     cg->useAnnoSet(as);
     RETURN_INTO_OBJREF(cci,iface::cellml_services::CodeInformation,cg->generateCode(model));
-    wchar_t* m = cci->errorMessage();
-    if (!wcscmp(m,L""))
+    std::wstring m = cci->errorMessage();
+    if (!wcscmp(m.c_str(),L""))
     {
       std::cout << "whoo hoo!" << std::endl;
       iface::cellml_services::ModelConstraintLevel mcl = cci->constraintLevel();
@@ -1070,9 +1070,8 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
           L"(double VOI, double *C, double *R, double *S, double *A),"
           L"double VOI, double *C, double *R, double *S, double *A, "
           L"double *V);\n";
-        wchar_t* frag = cci->functionsString();
+        std::wstring frag = cci->functionsString();
         code += frag;
-        free(frag);
 
         nBound = 1;
         nRates = cci->rateIndexCount();
@@ -1099,7 +1098,6 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
         //  L"double* STATES)\n{\n";
         code += frag;
         //code += L"}\n";
-        free(frag);
 
         /* rates      - All rates which are not static.
          */
@@ -1108,7 +1106,6 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
         //  L"double* CONSTANTS,double* ALGEBRAIC)\n{\n";
         code += frag;
         //code += L"}\n";
-        free(frag);
 
         /* variables  - All variables not computed by initConsts or rates
          *  (i.e., these are not required for the integration of the model and
@@ -1120,7 +1117,6 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
         //  L"double* RATES, double* STATES, double* ALGEBRAIC)\n{\n";
         code += frag;
         //code += L"}\n";
-        free(frag);
 
         // and now clear out initialisation of state variables and known variables.
         clearCodeAssignments(code,L"OC_STATE",mStateCounter);
@@ -1132,9 +1128,11 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _annotations)
     }
     else
     {
-      std::wcerr << "Error generating code: " << m << std::endl;
+    	// need to write out the message like this due to tracker item 3220
+      std::cerr << "Error generating code: ";
+      std::cerr << m;
+      std::cerr << std::endl;
     }
-    free(m);
 #endif // CUSTOM_CODE_GENERATION
   }
   catch (...)
