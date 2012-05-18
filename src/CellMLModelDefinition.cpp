@@ -686,56 +686,43 @@ static iface::cellml_api::CellMLVariable* findVariable(iface::cellml_api::Model*
   iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(_annotations);
   iface::cellml_services::CeVAS* cevas = static_cast<iface::cellml_services::CeVAS*>(_cevas);
   iface::cellml_api::CellMLVariable* v = NULL;
-  // search source variables of all variables from local components for matching type/index
-  RETURN_INTO_OBJREF(components,iface::cellml_api::CellMLComponentSet,model->localComponents());
-  RETURN_INTO_OBJREF(ci,iface::cellml_api::CellMLComponentIterator,components->iterateComponents());
+  // search through all source variables in the model until we find the matching type/index
+  // see tracker item 3294 for a discussion on why it is done this way.
   bool typeMatch = false;
   bool indexMatch = false;
-  while(true)
+  int length = cevas->length();
+  for (int i = 0; (i < length) && !(typeMatch && indexMatch); ++i)
   {
-    RETURN_INTO_OBJREF(c,iface::cellml_api::CellMLComponent,ci->nextComponent());
-    if (c == NULL) break;
-    RETURN_INTO_OBJREF(variables,iface::cellml_api::CellMLVariableSet,c->variables());
-    RETURN_INTO_OBJREF(vi,iface::cellml_api::CellMLVariableIterator,variables->iterateVariables());
-    while(true)
-    {
-      typeMatch = false;
-      indexMatch = false;
-      RETURN_INTO_OBJREF(variable,iface::cellml_api::CellMLVariable,vi->nextVariable());
-      if (variable == NULL) break;
-      RETURN_INTO_WSTRING(vname,variable->name());
-      RETURN_INTO_OBJREF(cvs,iface::cellml_services::ConnectedVariableSet,cevas->findVariableSet(variable));
-      v = cvs->sourceVariable();
-      RETURN_INTO_WSTRING(svname,v->name());
-      if (v)
-      {
-        RETURN_INTO_WSTRING(flag,as->getStringAnnotation(v,L"flag"));
-        if (!flag.empty())
-        {
-          if ((flag == L"STATE") && (type == 1)) typeMatch = true;
-          else if ((flag == L"KNOWN") && (type == 2)) typeMatch = true;
-          else if ((flag == L"WANTED") && (type == 3)) typeMatch = true;
-          else if ((flag == L"INDEPENDENT") && (type == 4)) typeMatch = true;
-        }
-        RETURN_INTO_WSTRING(str,as->getStringAnnotation(v,L"array_index"));
-        if (!str.empty())
-        {
-          wchar_t* tail = NULL;
-          int i = wcstol(str.c_str(),&tail,/*base 10*/10);
-          if (tail != str.c_str())
-          {
-            if (i == index) indexMatch = true;
-          }
-        }
-      }
-      if (typeMatch && indexMatch) break;
-    }
-    if (typeMatch && indexMatch) break;
+	  typeMatch = false;
+	  indexMatch = false;
+	  RETURN_INTO_OBJREF(cvs, iface::cellml_services::ConnectedVariableSet, cevas->getVariableSet(i));
+	  v = cvs->sourceVariable();
+	  if (v)
+	  {
+		  RETURN_INTO_WSTRING(flag,as->getStringAnnotation(v,L"flag"));
+		  if (!flag.empty())
+		  {
+			  if ((flag == L"STATE") && (type == 1)) typeMatch = true;
+			  else if ((flag == L"KNOWN") && (type == 2)) typeMatch = true;
+			  else if ((flag == L"WANTED") && (type == 3)) typeMatch = true;
+			  else if ((flag == L"INDEPENDENT") && (type == 4)) typeMatch = true;
+		  }
+		  RETURN_INTO_WSTRING(str,as->getStringAnnotation(v,L"array_index"));
+		  if (!str.empty())
+		  {
+			  wchar_t* tail = NULL;
+			  int i = wcstol(str.c_str(),&tail,/*base 10*/10);
+			  if (tail != str.c_str())
+			  {
+				  if (i == index) indexMatch = true;
+			  }
+		  }
+	  }
   }
   if (!(typeMatch && indexMatch))
   {
-    v->release_ref();
-    v = NULL;
+	  v->release_ref();
+	  v = NULL;
   }
   return v;
 }
