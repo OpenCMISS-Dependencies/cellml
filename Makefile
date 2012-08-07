@@ -81,6 +81,8 @@ main: preliminaries \
 	$(occellml_build)
 
 occellml_build_linux:
+	rm -rf $(LIBOCCELLML_BUILD_DIR) 
+	mkdir -p $(LIBOCCELLML_BUILD_DIR) 
 	( cd $(LIBOCCELLML_BUILD_DIR) && $(CMAKE_ENV) cmake --debug-output $(CMAKE_OPTIONS) $(CURDIR) > build.log 2>&1 )
 	( cd $(LIBOCCELLML_BUILD_DIR) && make >> build.log 2>&1 )
 	( cd $(LIBOCCELLML_BUILD_DIR) && make install >> build.log 2>&1 )
