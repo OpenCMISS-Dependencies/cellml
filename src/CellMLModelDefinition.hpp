@@ -1,6 +1,10 @@
 #ifndef _CELLMLMODELDEFINITION_H_
 #define _CELLMLMODELDEFINITION_H_
 
+#include <map>
+#include <vector>
+#include <IfaceCCGS.hxx>
+
 /**
  * The primary object used to define a CellML model for use in openCMISS.
  *
@@ -154,6 +158,8 @@ class CellMLModelDefinition
    * @return The generated code, if successful; and empty string otherwise.
    */
   std::wstring getModelAsCCode(void* model,void* cevas,void* annotations);
+  int flagVariable(const char* name, int type,
+                   std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount);
   std::string mURL;
   std::string mTmpDirName;
   bool mTmpDirExists;
@@ -165,6 +171,9 @@ class CellMLModelDefinition
   bool mSaveTempFiles;
   void* mHandle;
   bool mInstantiated;
+  std::map<std::pair<int,int>, double> mInitialValues;
+  std::map<std::string, int> mVariableTypes;
+  std::map<std::string, int> mVariableIndices;
 
   // need to access these?
  public:
