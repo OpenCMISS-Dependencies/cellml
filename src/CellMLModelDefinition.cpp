@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string>
+#include <sstream>
 #include <string.h>
 #include <wchar.h>
 #include <iostream>
@@ -29,14 +30,27 @@
 
 #include "CellMLModelDefinition.hpp"
 
+#define StateType 1
+#define KnownType 2
+#define WantedType 3
+#define IndependentType 4
+
+static void
+operator<<(std::ostream& data, const std::wstring& str)
+{
+  size_t n = wcstombs(NULL, str.c_str(), 0);
+  char* buf = new char[n + 1];
+  wcstombs(buf, str.c_str(), n + 1);
+  data << buf;
+  delete [] buf;
+}
+
 /*
  * Prototype local methods
  */
 typedef std::pair<std::string,std::string> CVpair;
 static CVpair splitName(const char* s);
 static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::Model* model,void* _cevas, const char* name);
-static iface::cellml_api::CellMLVariable* findVariable(iface::cellml_api::Model* model,void* _cevas, void* _annotations,
-    const int type,const int index);
 
 static std::wstring formatNumber(const int value)
 {
@@ -129,49 +143,66 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
       // only do it once and keep hold of the mapping (tracker item 3294)
       RETURN_INTO_OBJREF(cvbs,iface::cellml_services::CeVASBootstrap,CreateCeVASBootstrap());
       iface::cellml_services::CeVAS* cevas = cvbs->createCeVASForModel(model);
-      mCevas = static_cast<void*>(cevas);
-      // make sure we can generate code and get the initial code information
-      RETURN_INTO_OBJREF(cgb,iface::cellml_services::CodeGeneratorBootstrap,
-        CreateCodeGeneratorBootstrap());
-      RETURN_INTO_OBJREF(cg,iface::cellml_services::CodeGenerator,
-        cgb->createCodeGenerator());
-      try
+      std::wstring msg = cevas->modelError();
+      if (msg != L"")
       {
-    	cg->useCeVAS(cevas);
-        RETURN_INTO_OBJREF(cci,iface::cellml_services::CodeInformation,
-          cg->generateCode(model));
-        // need to keep a handle on the code information
-        cci->add_ref();
-        mCodeInformation = static_cast<void*>(cci);
-        // and add all state variables as wanted and the variable of integration as known
-        RETURN_INTO_OBJREF(cti,iface::cellml_services::ComputationTargetIterator,cci->iterateTargets());
-        while(1)
+        cevas->release_ref();
+        mModel = static_cast<void*>(NULL);
+        std::wcerr << "Error creating CellML Variable Association Service: " << msg << std::endl;
+        mCodeInformation = NULL;
+      }
+      else
+      {
+        mCevas = static_cast<void*>(cevas);
+        // make sure we can generate code and get the initial code information
+        RETURN_INTO_OBJREF(cgb,iface::cellml_services::CodeGeneratorBootstrap,
+          CreateCodeGeneratorBootstrap());
+        RETURN_INTO_OBJREF(cg,iface::cellml_services::CodeGenerator,
+          cgb->createCodeGenerator());
+        try
         {
-          RETURN_INTO_OBJREF(ct,iface::cellml_services::ComputationTarget,cti->nextComputationTarget());
-          if (ct == NULL) break;
-          if (ct->type() == iface::cellml_services::STATE_VARIABLE)
+          cg->useCeVAS(cevas);
+          RETURN_INTO_OBJREF(cci,iface::cellml_services::CodeInformation,
+          cg->generateCode(model));
+          // need to keep a handle on the code information
+          cci->add_ref();
+          mCodeInformation = static_cast<void*>(cci);
+          // and add all state variables as wanted and the variable of integration as known
+          RETURN_INTO_OBJREF(cti,iface::cellml_services::ComputationTargetIterator,cci->iterateTargets());
+          while (true)
           {
-            as->setStringAnnotation(ct->variable(),L"flag",L"STATE");
-            as->setStringAnnotation(ct->variable(),L"array",L"OC_STATE");
-            as->setStringAnnotation(ct->variable(),L"array_index",formatNumber(mStateCounter).c_str());
-            mStateCounter++;
-          }
-          else if (ct->type() == iface::cellml_services::VARIABLE_OF_INTEGRATION)
-          {
-            as->setStringAnnotation(ct->variable(),L"flag",L"INDEPENDENT");
-            mNumberOfIndependentVariables++;
-          }
-          else if (ct->degree() > 0)
-          {
-            //as->setStringAnnotation(ct->variable(),L"flag-degree",L"WANTED");
-            //mNumberOfWantedVariables++;
+            RETURN_INTO_OBJREF(ct,iface::cellml_services::ComputationTarget,cti->nextComputationTarget());
+            if (ct == NULL) break;
+
+            ObjRef<iface::cellml_api::CellMLVariable> v(ct->variable());
+            if (ct->type() == iface::cellml_services::STATE_VARIABLE)
+            {
+              try
+              {
+                if (v->initialValue() != L"")
+                  mInitialValues.insert(std::pair<std::pair<int,int>, double>
+                                        (
+                                         std::pair<int,int>(StateType, mStateCounter),
+                                         v->initialValueValue()
+                                        )
+                                       );
+              } catch (...) {}
+              mVariableTypes[v->objid()] = StateType;
+              mVariableIndices[v->objid()] = mStateCounter;
+              mStateCounter++;
+            }
+            else if (ct->type() == iface::cellml_services::VARIABLE_OF_INTEGRATION)
+            {
+              mVariableTypes[v->objid()] = IndependentType;
+              mNumberOfIndependentVariables++;
+            }
           }
         }
-      }
-      catch (...)
-      {
-        std::wcerr << L"Error generating the code information for the model" << std::endl;
-        mCodeInformation = static_cast<void*>(NULL);
+        catch (...)
+        {
+          std::wcerr << L"Error generating the code information for the model" << std::endl;
+          mCodeInformation = static_cast<void*>(NULL);
+        }
       }
     }
     catch (...)
@@ -272,147 +303,96 @@ int CellMLModelDefinition::getInitialValue(const char* name,double* value)
 
 int CellMLModelDefinition::getInitialValueByIndex(const int type,const int index,double* value)
 {
-  int code = -1;
-  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
-  if (!model)
-  {
-    std::cerr << "CellMLModelDefinition::getInitialValueByIndex -- missing model?" << std::endl;
-    return -2;
-  }
-  RETURN_INTO_OBJREF(var,iface::cellml_api::CellMLVariable,findVariable(model,mCevas,mAnnotations,type,index));
-  if (!var)
+  std::map<std::pair<int, int>, double>::iterator i =
+    mInitialValues.find(std::pair<int, int>(type, index));
+
+  if (i == mInitialValues.end())
   {
     std::cerr << "CellMLModelDefinition::getInitialValueByIndex -- unable to find variable: " << index
         << "; of type: " << type << std::endl;
     return -3;
   }
-  RETURN_INTO_WSTRING(iv,var->initialValue());
-  if (iv != L"")
-  {
-    wchar_t* end;
-    double v = wcstod(iv.c_str(),&end);
-    if (end == NULL || *end != 0)
-    {
-      std::wcerr << "CellMLModelDefinition::getInitialValueByIndex -- variable: " << index << "; of type:"
-          << type << "; has non-numeric initial value: " << iv.c_str() << std::endl;
-      code = -5;
-    }
-    else
-    {
-      *value = v;
-      code = 0;
-    }
-  }
-  else
-  {
-    std::cerr << "CellMLModelDefinition::getInitialValueByIndex -- variable: " << index << "; of type:"
-        << type << "; has no initial value." << std::endl;
-    code = -4;
-  }
-  return code;
+
+  *value = i->second;
+  return 0;
 }
 
 int CellMLModelDefinition::getVariableType(const char* name,int* type)
 {
-  int StateType = 1;
-  int KnownType = 2;
-  int WantedType = 3;
-  int IndependentType = 4;
-  int code = -1;
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model && !mCodeInformation && !mAnnotations)
   {
     std::cerr << "CellMLModelDefinition::getVariableType -- missing model?" << std::endl;
     return -2;
   }
-  RETURN_INTO_OBJREF(var,iface::cellml_api::CellMLVariable,findLocalVariable(model,mCevas,name));
+
+  ObjRef<iface::cellml_api::CellMLVariable> var(findLocalVariable(model, mCevas, name));
   if (!var)
   {
     std::cerr << "CellMLModelDefinition::getVariableType -- unable to find named variable: " << name << std::endl;
     return -3;
   }
-  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(mAnnotations);
-  RETURN_INTO_WSTRING(flag,as->getStringAnnotation(var,L"flag"));
-  if (!flag.empty())
-  {
-    code = 0;
-    if (flag == L"STATE") *type = StateType;
-    else if (flag == L"KNOWN") *type = KnownType;
-    else if (flag == L"WANTED") *type = WantedType;
-    else if (flag == L"INDEPENDENT") *type = IndependentType;
-    else
-    {
-      std::cerr << "CellMLModelDefinition::getVariableType -- variable: " << name << "; has an unknown type: ";
-      std::wcerr << flag.c_str();
-      std::cerr << std::endl;
-      code = -5;
-    }
-  }
-  else
+
+  std::map<std::string, int>::iterator i = mVariableTypes.find(var->objid());
+  if (i == mVariableTypes.end())
   {
     std::cerr << "CellMLModelDefinition::getVariableType -- unable to find named variable's type: " << name << std::endl;
     return -4;
   }
-  return code;
+
+  *type = i->second;
+  return 0;
 }
 
 int CellMLModelDefinition::getVariableIndex(const char* name,int* index)
 {
-  int code = -1;
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model && !mCodeInformation && !mAnnotations)
   {
     std::cerr << "CellMLModelDefinition::getVariableIndex -- missing model?" << std::endl;
     return -2;
   }
-  RETURN_INTO_OBJREF(var,iface::cellml_api::CellMLVariable,findLocalVariable(model,mCevas,name));
+
+  ObjRef<iface::cellml_api::CellMLVariable> var(findLocalVariable(model, mCevas, name));
   if (!var)
   {
     std::cerr << "CellMLModelDefinition::getVariableIndex -- unable to find named variable: " << name << std::endl;
     return -3;
   }
-  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(mAnnotations);
-  RETURN_INTO_WSTRING(str,as->getStringAnnotation(var,L"array_index"));
-  if (!str.empty())
+
+  std::map<std::string, int>::iterator i = mVariableIndices.find(var->objid());
+  if (i == mVariableIndices.end())
   {
-    code = 0;
-    wchar_t* tail = NULL;
-    int i = wcstol(str.c_str(),&tail,/*base 10*/10);
-    if (tail != str.c_str()) *index = i;
-    else
-    {
-      std::cerr << "CellMLModelDefinition::getVariableIndex -- variable: " << name << "; has an invalid index: ";
-      std::wcerr << str.c_str();
-      std::cerr << std::endl;
-      code = -5;
-    }
-  }
-  else
-  {
-    std::cerr << "CellMLModelDefinition::getVariableIndex -- unable to find named variable's index: " << name << std::endl;
+    std::cerr << "CellMLModelDefinition::getVariableIndex -- unable to find named variable's type: " << name << std::endl;
     return -4;
   }
-  return code;
+
+  *index = i->second;
+  return 0;
 }
 
-static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t* typeString,
-    std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount)
+int CellMLModelDefinition::flagVariable
+(
+ const char* name, int type,
+ std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount
+)
 {
-  if (! d->mCodeInformation)
+  if (!mCodeInformation)
   {
     std::cerr << "CellMLModelDefinition::flagVariable -- missing model?" << std::endl;
     return -1;
   }
+
   //std::cout << "setting variable '" << cv.second.c_str() << "' from component '" << cv.first.c_str() << "' as KNOWN" << std::endl;
-  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(d->mModel);
-  iface::cellml_services::CodeInformation* cci= static_cast<iface::cellml_services::CodeInformation*>(d->mCodeInformation);
-  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(d->mAnnotations);
-  RETURN_INTO_OBJREF(sv,iface::cellml_api::CellMLVariable,findLocalVariable(model,d->mCevas,name));
+  iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
+  iface::cellml_services::CodeInformation* cci= static_cast<iface::cellml_services::CodeInformation*>(mCodeInformation);
+  RETURN_INTO_OBJREF(sv,iface::cellml_api::CellMLVariable,findLocalVariable(model,mCevas,name));
   // check if source is already marked as known - what to do? safe to continue with no error
-  RETURN_INTO_WSTRING(currentAnnotation,as->getStringAnnotation(sv,L"flag"));
-  if (!currentAnnotation.empty())
+
+  std::map<std::string, int>::iterator currentAnnotation = mVariableTypes.find(sv->objid());
+  if (currentAnnotation != mVariableTypes.end())
   {
-    if (currentAnnotation == typeString)
+    if ((*currentAnnotation).second == type)
     {
       std::cout << "Already flagged same type, nothing to do." << std::endl;
       return 0;
@@ -462,11 +442,18 @@ static int flagVariable(CellMLModelDefinition* d,const char* name, const wchar_t
   }
   if (compatible)
   {
-    as->setStringAnnotation(sv,L"flag",typeString);
-    std::wstring ename(L"OC_");
-    ename += typeString;
-    as->setStringAnnotation(sv,L"array",ename.c_str());
-    as->setStringAnnotation(ct->variable(),L"array_index",formatNumber(specificCount).c_str());
+    mVariableTypes[sv->objid()] = type;
+    mVariableIndices[sv->objid()] = specificCount;
+    try
+    {
+      if (sv->initialValue() != L"")
+        mInitialValues.insert(std::pair<std::pair<int,int>, double>
+                              (
+                               std::pair<int,int>(type, specificCount),
+                               sv->initialValueValue()
+                               )
+                              );
+    } catch (...) {}
     specificCount++;
     count++;
   }
@@ -516,7 +503,7 @@ int CellMLModelDefinition::setVariableAsKnown(const char* name)
   vets.push_back(iface::cellml_services::CONSTANT);
   //vets.push_back(iface::cellml_services::VARIABLE_OF_INTEGRATION);
   //vets.push_back(iface::cellml_services::FLOATING);
-  int code = flagVariable(this,name,L"KNOWN",vets,mNumberOfKnownVariables,mParameterCounter);
+  int code = flagVariable(name, KnownType, vets, mNumberOfKnownVariables, mParameterCounter);
   return code;
 }
 
@@ -531,7 +518,7 @@ int CellMLModelDefinition::setVariableAsWanted(const char* name)
   // we need to allow constant variables to be flagged as wanted since if it is a model with no
   // differential equations then all algebraic variables will be constant - i.e., constitutive laws
   vets.push_back(iface::cellml_services::CONSTANT);
-  int code = flagVariable(this,name,L"WANTED",vets,mNumberOfWantedVariables,mIntermediateCounter);
+  int code = flagVariable(name, WantedType, vets, mNumberOfWantedVariables, mIntermediateCounter);
   return code;
 }
 
@@ -680,53 +667,6 @@ static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::M
   return v;
 }
 
-static iface::cellml_api::CellMLVariable* findVariable(iface::cellml_api::Model* model,void* _cevas,
-		void* _annotations,const int type,const int index)
-{
-  iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(_annotations);
-  iface::cellml_services::CeVAS* cevas = static_cast<iface::cellml_services::CeVAS*>(_cevas);
-  iface::cellml_api::CellMLVariable* v = NULL;
-  // search through all source variables in the model until we find the matching type/index
-  // see tracker item 3294 for a discussion on why it is done this way.
-  bool typeMatch = false;
-  bool indexMatch = false;
-  int length = cevas->length();
-  for (int i = 0; (i < length) && !(typeMatch && indexMatch); ++i)
-  {
-	  typeMatch = false;
-	  indexMatch = false;
-	  RETURN_INTO_OBJREF(cvs, iface::cellml_services::ConnectedVariableSet, cevas->getVariableSet(i));
-	  v = cvs->sourceVariable();
-	  if (v)
-	  {
-		  RETURN_INTO_WSTRING(flag,as->getStringAnnotation(v,L"flag"));
-		  if (!flag.empty())
-		  {
-			  if ((flag == L"STATE") && (type == 1)) typeMatch = true;
-			  else if ((flag == L"KNOWN") && (type == 2)) typeMatch = true;
-			  else if ((flag == L"WANTED") && (type == 3)) typeMatch = true;
-			  else if ((flag == L"INDEPENDENT") && (type == 4)) typeMatch = true;
-		  }
-		  RETURN_INTO_WSTRING(str,as->getStringAnnotation(v,L"array_index"));
-		  if (!str.empty())
-		  {
-			  wchar_t* tail = NULL;
-			  int i = wcstol(str.c_str(),&tail,/*base 10*/10);
-			  if (tail != str.c_str())
-			  {
-				  if (i == index) indexMatch = true;
-			  }
-		  }
-	  }
-  }
-  if (!(typeMatch && indexMatch))
-  {
-	  v->release_ref();
-	  v = NULL;
-  }
-  return v;
-}
-
 #if 0
 // Bit of a hack, but will do the job until the full URI functionality in the current trunk CellML API makes it into a release - or could look at using the xmlURIPtr that comes with libxml2...
 static char* getURIFromURIWithFragmentID(const char* uri)
@@ -819,17 +759,16 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _cevas,void* _annotati
   while (true)
   {
     RETURN_INTO_OBJREF(ct, iface::cellml_services::ComputationTarget,
-        cti->nextComputationTarget());
+                       cti->nextComputationTarget());
     if (ct == NULL) break;
-    RETURN_INTO_WSTRING(flag,as->getStringAnnotation(ct->variable(),L"flag"));
-    if ((flag == L"WANTED") || (ct->degree() > 0))
-    {
+
+    ObjRef<iface::cellml_api::CellMLVariable> var(ct->variable());
+    std::map<std::string, int>::iterator flag(mVariableTypes.find(var->objid()));
+
+    if ((flag != mVariableTypes.end() && flag->second == WantedType) || (ct->degree() > 0))
       ccg->requestComputation(ct);
-    }
-    else if (flag == L"KNOWN")
-    {
+    else if (flag != mVariableTypes.end() && flag->second == KnownType)
       ccg->markAsKnown(ct);
-    }
   }
 #endif
   /* The trunk MaLaES has been updated since the 1.5 release, so define a
@@ -997,22 +936,33 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _cevas,void* _annotati
     {
       RETURN_INTO_OBJREF(cvs,iface::cellml_services::ConnectedVariableSet,cevas->getVariableSet(i));
       RETURN_INTO_OBJREF(sv,iface::cellml_api::CellMLVariable,cvs->sourceVariable());
-      RETURN_INTO_WSTRING(array,as->getStringAnnotation(sv,L"array"));
-      RETURN_INTO_WSTRING(index,as->getStringAnnotation(sv,L"array_index"));
-      if (!array.empty() && !index.empty())
+      std::map<std::string, int>::iterator typeit(mVariableTypes.find(sv->objid()));
+      std::map<std::string, int>::iterator indexit(mVariableIndices.find(sv->objid()));
+      if (typeit != mVariableTypes.end() && indexit != mVariableIndices.end() &&
+          typeit->second != IndependentType)
       {
-        std::wstring ename = array;
-        ename += L"[";
-        ename += index;
-        ename += L"]";
-        as->setStringAnnotation(sv,L"expression",ename.c_str());
-        if (array == L"OC_STATE")
+        std::wstringstream ename;
+        switch (typeit->second)
         {
-          ename = std::wstring(L"OC_RATE");
-          ename += L"[";
-          ename += index;
-          ename += L"]";
-          as->setStringAnnotation(sv,L"expression_d1",ename.c_str());
+        case StateType:
+          ename << L"OC_STATE";
+          break;
+        case KnownType:
+          ename << L"OC_KNOWN";
+          break;
+        case WantedType:
+          ename << L"OC_WANTED";
+          break;
+        }
+        ename << L"[" << indexit->second << L"]";
+        as->setStringAnnotation(sv,L"expression",ename.str().c_str());
+
+        if (typeit->second == StateType)
+        {
+          ename.str(L"");
+          ename.clear();
+          ename << L"OC_RATE[" << indexit->second << L"]";
+          as->setStringAnnotation(sv,L"expression_d1",ename.str().c_str());
         }
       }
     }
