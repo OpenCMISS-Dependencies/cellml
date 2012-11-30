@@ -9,24 +9,18 @@ SHELL = /bin/bash
 #----------------------------------------------------------------------------------------------------------------------------------
 
 ifndef OPENCMISSEXTRAS_ROOT
-  OPENCMISSEXTRAS_ROOT := ${OPENCMISS_ROOT}/../opencmissextras
+  OPENCMISSEXTRAS_ROOT := ${OPENCMISS_ROOT}/../OpenCMISSExtras
   CDA_ROOT := $(CURDIR)/../../../..
-  MAKEINC_ROOT := $(CURDIR)/../../opencmissextras/utils
+  OCE_GLOBAL_ROOT := $(CURDIR)/../../OpenCMISSExtras
 else
   CDA_ROOT := ${OPENCMISSEXTRAS_ROOT}
-  MAKEINC_ROOT := ${OPENCMISSEXTRAS_ROOT}/utils
+  OCE_GLOBAL_ROOT := ${OPENCMISSEXTRAS_ROOT}
 endif
+MAKEINC_ROOT := $(OCE_GLOBAL_ROOT)/utils/make
 
 include $(MAKEINC_ROOT)/Makefile.inc
 
-ifdef COMPILER_VERSION
-  BUILD_NAME = $(LIB_ARCH_DIR)$(DEBUG_SUFFIX)$(PROF_SUFFIX)/$(COMPILER)_$(COMPILER_VERSION)
-else
-  BUILD_NAME = $(LIB_ARCH_DIR)$(DEBUG_SUFFIX)$(PROF_SUFFIX)/$(COMPILER)
-endif
-
-CDA_DIR = $(CDA_ROOT)/cellml/$(BUILD_NAME)
-COMMON_DIR = $(CDA_ROOT)/common/$(BUILD_NAME)
+BUILD_NAME = $(ENVIRONMENT)$(BUILD_TYPE)$(NOMPI_TOOLCHAIN)
 
 LIBOCCELLML_INSTALL_DIR = $(OPENCMISS_ROOT)/cellml/$(BUILD_NAME)
 LIBOCCELLML_BUILD_DIR = $(CURDIR)/build/$(BUILD_NAME)
