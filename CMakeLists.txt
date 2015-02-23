@@ -1,61 +1,66 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1)
+PROJECT(cellml-api VERSION 1.0 LANGUAGES Fortran CXX)
 
-PROJECT(liboccellml Fortran CXX )
+option(BUILD_TESTS "${PROJECT_NAME} - Build tests" ON)
+option(PACKAGE_CONFIG_DIR "Directory for package config files (relative to CMAKE_INSTALL_PREFIX)" "lib/cmake")
 
-#ENABLE_TESTING()
+# This is our own package
+FIND_PACKAGE(LIBCELLML REQUIRED) # gives ccgs
+FIND_PACKAGE(LibXml2 REQUIRED)
 
-#ENABLE_LANGUAGE(Fortran)
-
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${liboccellml_SOURCE_DIR})
-
-FIND_PACKAGE(CellML REQUIRED)
-FIND_PACKAGE(CCGS REQUIRED)
-FIND_PACKAGE(LibXml2 REQUIRED QUIET)
+# Use common include directory
+SET(LIBCELLML_INCLUDE_DEST include/cellml)
 
 # Probably better to not do this as it probably overrides and external value?
 IF( MSVC )
     ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600 )
-ELSE ( MSVC )
+ELSE()
     # allow dynamic compilation
-    ADD_DEFINITIONS(-DDYNAMIC_COMPILE)
-    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -fPIC ${LIBXML2_DEFINITIONS}")
-ENDIF( MSVC )
+    ADD_DEFINITIONS(-DDYNAMIC_COMPILE -D${LIBXML2_DEFINITIONS})
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -fPIC")
+ENDIF()
 
 INCLUDE_DIRECTORIES(
-  ${CELLML_INCLUDE_DIR}
-  ${CCGS_INCLUDE_DIR}
   ${LIBXML2_INCLUDE_DIR}
 )
 
-SET(liboccellml_SRCS
+SET(cellml-api-src
   src/CellMLModelDefinitionF.cpp
   src/CellMLModelDefinition.cpp
   src/ccgs_required_functions.cpp
 )
 
 # need to handle the fortran code specially?
-ADD_LIBRARY(cellml_model_definition STATIC src/cellml_model_definition.f90)
-ADD_LIBRARY(occellml STATIC ${liboccellml_SRCS})
+ADD_LIBRARY(cellml_model_definition src/cellml_model_definition.f90)
+#target_include_directories(cellml_model_definition PUBLIC ${LIBCELLML_INCLUDE_DEST})
+ADD_LIBRARY(cellml_api ${cellml-api-src})
+target_link_libraries(cellml_api PUBLIC ccgs ${LIBXML2_LIBRARIES})
 
 # Testing executables
-#ADD_EXECUTABLE(test_cellml_model_definition tests/src/test_cellml_model_definition.f90)
-#SET_TARGET_PROPERTIES(test_cellml_model_definition PROPERTIES LINKER_LANGUAGE Fortran)
-#TARGET_LINK_LIBRARIES(test_cellml_model_definition
-#    occellml
-#    cellml_model_definition
-#    ${CELLML_LIBRARIES}
-#    ${CCGS_LIBRARIES}
-#    ${LIBXML2_LIBRARIES}
-#    -ldl -lm
-##    -lstdc++
-#)
-#ADD_TEST(test_cellml_model_definition test_cellml_model_definition ${CMAKE_SOURCE_DIR}/tests/input/sin_approximations_import-OCD.xml)
-#ADD_TEST(check_results diff ${CMAKE_SOURCE_DIR}/tests/input/test_cellml_model_definition_results results)
+if(BUILD_TESTS)
+    ENABLE_TESTING()
+    ADD_EXECUTABLE(test_cellml_model_definition tests/src/test_cellml_model_definition.f90)
+    SET_TARGET_PROPERTIES(test_cellml_model_definition PROPERTIES LINKER_LANGUAGE Fortran)
+    TARGET_LINK_LIBRARIES(test_cellml_model_definition
+        cellml_api
+        cellml_model_definition
+        )
+    ADD_TEST(test_cellml_model_definition test_cellml_model_definition ${CMAKE_SOURCE_DIR}/tests/input/sin_approximations_import-OCD.xml)
+    ADD_TEST(check_results diff ${CMAKE_SOURCE_DIR}/tests/input/test_cellml_model_definition_results results)
+endif()
 
-INSTALL(TARGETS occellml
-	ARCHIVE DESTINATION lib
+# Install part
+install(TARGETS cellml_model_definition EXPORT cellml-api-config
+    DESTINATION lib
+    INCLUDES DESTINATION ${LIBCELLML_INCLUDE_DEST})
+install(FILES ${CMAKE_BINARY_DIR}/cellml_model_definition.mod
+	DESTINATION ${LIBCELLML_INCLUDE_DEST}
 )
-
-INSTALL(FILES ${CMAKE_BINARY_DIR}/cellml_model_definition.mod
-	DESTINATION include
-)
+install(TARGETS cellml_api EXPORT cellml-api-config
+    DESTINATION lib
+    INCLUDES DESTINATION include)
+install(EXPORT cellml-api-config DESTINATION ${PACKAGE_CONFIG_DIR})   
+include(CMakePackageConfigHelpers)
+WRITE_BASIC_PACKAGE_VERSION_FILE(${CMAKE_CURRENT_BINARY_DIR}/cellml-api-config-version.cmake
+    COMPATIBILITY AnyNewerVersion)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cellml-api-config-version.cmake DESTINATION ${PACKAGE_CONFIG_DIR})
