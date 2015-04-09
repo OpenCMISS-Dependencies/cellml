@@ -16,13 +16,9 @@ IF( MSVC )
     ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600 )
 ELSE()
     # allow dynamic compilation
-    ADD_DEFINITIONS(-DDYNAMIC_COMPILE -D${LIBXML2_DEFINITIONS})
-    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -fPIC")
+    ADD_DEFINITIONS(-DDYNAMIC_COMPILE)
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
 ENDIF()
-
-INCLUDE_DIRECTORIES(
-  ${LIBXML2_INCLUDE_DIR}
-)
 
 SET(cellml-api-src
   src/CellMLModelDefinitionF.cpp
@@ -32,9 +28,8 @@ SET(cellml-api-src
 
 # need to handle the fortran code specially?
 ADD_LIBRARY(cellml_model_definition src/cellml_model_definition.f90)
-#target_include_directories(cellml_model_definition PUBLIC ${LIBCELLML_INCLUDE_DEST})
 ADD_LIBRARY(cellml_api ${cellml-api-src})
-target_link_libraries(cellml_api PUBLIC ccgs ${LIBXML2_LIBRARIES})
+target_link_libraries(cellml_api PUBLIC ccgs xml2)
 
 # Testing executables
 if(BUILD_TESTS)
