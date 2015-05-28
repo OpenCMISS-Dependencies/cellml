@@ -45,17 +45,17 @@ if(BUILD_TESTS)
 endif()
 
 # Install part
-install(TARGETS cellml_model_definition EXPORT cellml-api-config
+install(TARGETS cellml_model_definition EXPORT cellml-config
     DESTINATION lib
     INCLUDES DESTINATION ${LIBCELLML_INCLUDE_DEST})
 install(FILES ${CMAKE_BINARY_DIR}/cellml_model_definition.mod
 	DESTINATION ${LIBCELLML_INCLUDE_DEST}
 )
-install(TARGETS cellml_api EXPORT cellml-api-config
+install(TARGETS cellml_api EXPORT cellml-config
     DESTINATION lib
     INCLUDES DESTINATION include)
-install(EXPORT cellml-api-config DESTINATION ${PACKAGE_CONFIG_DIR})   
+install(EXPORT cellml-config DESTINATION ${PACKAGE_CONFIG_DIR})   
 include(CMakePackageConfigHelpers)
-WRITE_BASIC_PACKAGE_VERSION_FILE(${CMAKE_CURRENT_BINARY_DIR}/cellml-api-config-version.cmake
+WRITE_BASIC_PACKAGE_VERSION_FILE(${CMAKE_CURRENT_BINARY_DIR}/cellml-config-version.cmake
     COMPATIBILITY AnyNewerVersion)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cellml-api-config-version.cmake DESTINATION ${PACKAGE_CONFIG_DIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-version.cmake DESTINATION ${PACKAGE_CONFIG_DIR})
