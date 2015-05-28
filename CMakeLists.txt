@@ -27,9 +27,11 @@ SET(cellml-api-src
 )
 
 # need to handle the fortran code specially?
-ADD_LIBRARY(cellml_model_definition src/cellml_model_definition.f90)
+
 ADD_LIBRARY(cellml_api ${cellml-api-src})
 target_link_libraries(cellml_api PUBLIC ccgs xml2)
+ADD_LIBRARY(cellml_model_definition src/cellml_model_definition.f90)
+target_link_libraries(cellml_model_definition LINK_INTERFACE_LIBRARIES cellml_api)
 
 # Testing executables
 if(BUILD_TESTS)
