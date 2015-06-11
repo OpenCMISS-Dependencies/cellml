@@ -60,4 +60,14 @@ install(EXPORT cellml-config DESTINATION ${PACKAGE_CONFIG_DIR})
 include(CMakePackageConfigHelpers)
 WRITE_BASIC_PACKAGE_VERSION_FILE(${CMAKE_CURRENT_BINARY_DIR}/cellml-config-version.cmake
     COMPATIBILITY AnyNewerVersion)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-version.cmake DESTINATION ${PACKAGE_CONFIG_DIR})
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake 
+    "include(CMakeFindDependencyMacro)\r\n"
+    "set(_OLD_IMPORT_PREFIX \${_IMPORT_PREFIX})\r\n"
+    "find_dependency(LIBCELLML ${LIBCELLML_VERSION})\r\n"
+    "find_dependency(LibXml2 ${LIBXML2_VERSION})\r\n"
+    "set(_IMPORT_PREFIX \${_OLD_IMPORT_PREFIX})"
+)
+install(FILES 
+    ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake
+    DESTINATION ${PACKAGE_CONFIG_DIR})
