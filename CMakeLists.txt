@@ -5,8 +5,8 @@ option(BUILD_TESTS "${PROJECT_NAME} - Build tests" ON)
 option(PACKAGE_CONFIG_DIR "Directory for package config files (relative to CMAKE_INSTALL_PREFIX)" "lib/cmake")
 
 # This is our own package
-FIND_PACKAGE(LIBCELLML REQUIRED) # gives ccgs
-FIND_PACKAGE(LibXml2 REQUIRED)
+FIND_PACKAGE(LIBCELLML ${LIBCELLML_VERSION} REQUIRED) # gives ccgs
+FIND_PACKAGE(LibXml2 ${LIBXML2_VERSION} REQUIRED)
 
 # Use common include directory
 SET(LIBCELLML_INCLUDE_DEST include/cellml)
