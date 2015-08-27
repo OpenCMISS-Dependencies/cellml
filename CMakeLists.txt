@@ -5,20 +5,23 @@ option(BUILD_TESTS "${PROJECT_NAME} - Build tests" ON)
 option(PACKAGE_CONFIG_DIR "Directory for package config files (relative to CMAKE_INSTALL_PREFIX)" "lib/cmake")
 
 # This is our own package
-FIND_PACKAGE(LIBCELLML ${LIBCELLML_VERSION} REQUIRED) # gives ccgs
-FIND_PACKAGE(LibXml2 ${LIBXML2_VERSION} REQUIRED)
+find_package(LIBCELLML ${LIBCELLML_VERSION} REQUIRED) # gives ccgs
+find_package(LibXml2 ${LIBXML2_VERSION} REQUIRED)
 
 # Use common include directory
-SET(LIBCELLML_INCLUDE_DEST include/cellml)
+set(LIBCELLML_INCLUDE_DEST include/cellml)
 
 # Probably better to not do this as it probably overrides and external value?
-IF( MSVC )
-    ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600 )
-ELSE()
-    # allow dynamic compilation
-    ADD_DEFINITIONS(-DDYNAMIC_COMPILE)
-    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
-ENDIF()
+if( MSVC )
+    add_definitions( -D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600 )    
+elseif(NOT MINGW)
+    add_definitions(-DDYNAMIC_COMPILE)
+endif()
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-Wall -Werror" W_FLAGS)
+if (W_FLAGS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+endif()
 
 SET(cellml-api-src
   src/CellMLModelDefinitionF.cpp
@@ -28,22 +31,25 @@ SET(cellml-api-src
 
 # need to handle the fortran code specially?
 
-ADD_LIBRARY(cellml_api ${cellml-api-src})
+add_library(cellml_api ${cellml-api-src})
 target_link_libraries(cellml_api PUBLIC ccgs xml2)
-ADD_LIBRARY(cellml_model_definition src/cellml_model_definition.f90)
+add_library(cellml_model_definition src/cellml_model_definition.f90)
 target_link_libraries(cellml_model_definition LINK_INTERFACE_LIBRARIES cellml_api)
 
 # Testing executables
 if(BUILD_TESTS)
-    ENABLE_TESTING()
-    ADD_EXECUTABLE(test_cellml_model_definition tests/src/test_cellml_model_definition.f90)
-    SET_TARGET_PROPERTIES(test_cellml_model_definition PROPERTIES LINKER_LANGUAGE Fortran)
-    TARGET_LINK_LIBRARIES(test_cellml_model_definition
+    enable_testing()
+    add_executable(test_cellml_model_definition tests/src/test_cellml_model_definition.f90)
+    set_target_properties(test_cellml_model_definition PROPERTIES LINKER_LANGUAGE Fortran)
+    target_link_libraries(test_cellml_model_definition
         cellml_api
         cellml_model_definition
         )
-    ADD_TEST(test_cellml_model_definition test_cellml_model_definition ${CMAKE_SOURCE_DIR}/tests/input/sin_approximations_import-OCD.xml)
-    ADD_TEST(check_results diff ${CMAKE_SOURCE_DIR}/tests/input/test_cellml_model_definition_results results)
+    add_test(test_cellml_model_definition test_cellml_model_definition ${CMAKE_SOURCE_DIR}/tests/input/sin_approximations_import-OCD.xml)
+    find_program(DIFF_EXEC diff)
+    if (DIFF_EXEC)
+        add_test(check_results ${DIFF_EXEC} ${CMAKE_SOURCE_DIR}/tests/input/test_cellml_model_definition_results results)
+    endif()
 endif()
 
 # Install part

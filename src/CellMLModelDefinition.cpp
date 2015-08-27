@@ -11,7 +11,7 @@
 #  include <dlfcn.h>
 #endif
 
-#ifdef _MSC_VER
+#if defined _MSC_VER || defined __MINGW32__
 #	include <direct.h>
 #endif
 
