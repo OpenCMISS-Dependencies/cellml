@@ -304,7 +304,7 @@ static char* getAbsoluteURI(const char* uri)
       sprintf(abs,"file://%s/%s",cwd,uri);
       free(cwd);
       // and make sure \'s become /'s
-      int i;
+      unsigned int i;
       for (i=0; i < strlen(abs); ++i) if (abs[i] == '\\') abs[i] = '/';
       /*printf("%s\n",abs);*/
       return(abs);
