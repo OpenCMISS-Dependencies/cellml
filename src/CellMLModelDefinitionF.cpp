@@ -270,16 +270,28 @@ static char* getAbsoluteURI(const char* uri)
 {
   if (uri)
   {
+	  std::cout << "Getting absolute URL for: " << uri << std::endl;
     if (strstr(uri,"://") != NULL)
     {
       /*printf("URI (%s) already absolute.\n",uri);*/
+		std::cout << "already absolute" << std::endl;
       char* abs = (char*)malloc(strlen(uri)+1);
       strcpy(abs,uri);
       return(abs);
     }
+	else if (uri[1]==':')
+	{
+		// Windows drive letter - c:/path/to/file
+		std::cout << "Nice windows drive" << std::endl;
+      char* abs = (char*)malloc(strlen(uri)+1+7);
+      sprintf(abs,"%s",uri);
+      /*printf("%s\n",abs);*/
+      return(abs);
+	}
     else if (uri[0]=='/')
     {
       /*printf("URI (%s) absolute path, making absolute URI: ",uri);*/
+		std::cout << "absolute path" << std::endl;
       char* abs = (char*)malloc(strlen(uri)+1+7);
       sprintf(abs,"file://%s",uri);
       /*printf("%s\n",abs);*/
@@ -288,6 +300,7 @@ static char* getAbsoluteURI(const char* uri)
     else
     {
       /* relative filename ? append absoulte path */
+		std::cout << "Relative ----> absolute" << std::endl;
       /*printf("URI (%s) is relative path, making absolute URI: ",uri);*/
 		int size;
 #ifdef WIN32
@@ -301,7 +314,7 @@ static char* getAbsoluteURI(const char* uri)
 				// FIXME: should check for an error...
 			}
       char* abs = (char*)malloc(strlen(cwd)+strlen(uri)+1+8);
-      sprintf(abs,"file://%s/%s",cwd,uri);
+      sprintf(abs,"%s/%s",cwd,uri);
       free(cwd);
       // and make sure \'s become /'s
       unsigned int i;
