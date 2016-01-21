@@ -1,0 +1,1089 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<model
+    name="noble_model_1962"
+    cmeta:id="noble_model_1962"
+    xmlns="http://www.cellml.org/cellml/1.0#"
+    xmlns:cellml="http://www.cellml.org/cellml/1.0#"
+    xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+  <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+      xmlns:bqs="http://www.cellml.org/bqs/1.0#"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:dcterms="http://purl.org/dc/terms/"
+      xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#">
+    <!--
+      The following RDF block contains metadata that applies to this document
+      as a whole, as indicated by the empty about attribute on the 
+      <rdf:Description> element.
+    -->
+    <rdf:Description rdf:about="">
+      <!--
+        The Model Builder Metadata.  The Dublin Core "creator" element is used  
+        to indicate the person who translated the model into CellML.
+      -->
+      <dc:creator rdf:parseType="Resource">
+        <vCard:N rdf:parseType="Resource">
+          <vCard:Family>Lloyd</vCard:Family>
+          <vCard:Given>Catherine</vCard:Given>
+          <vCard:Other>May</vCard:Other>
+        </vCard:N>
+        <vCard:EMAIL rdf:parseType="Resource">
+          <rdf:value>c.lloyd@auckland.ac.nz</rdf:value>
+          <rdf:type rdf:resource="http://imc.org/vCard/3.0#internet" />
+        </vCard:EMAIL>
+        <vCard:ORG rdf:parseType="Resource">
+          <vCard:Orgname>The University of Auckland</vCard:Orgname>
+          <vCard:Orgunit>Bioengineering Institute</vCard:Orgunit>
+        </vCard:ORG>
+      </dc:creator>
+      
+      <!--
+        The Creation Date metadata. This is the date on which the model
+        was translated into CellML.
+      -->
+      <dcterms:created rdf:parseType="Resource">
+        <dcterms:W3CDTF>2001-12-18</dcterms:W3CDTF>
+      </dcterms:created>
+      
+      <!--
+        The Modification History metadata. This lists the changes that have been
+        made to the document, who made the changes, and when they were made.
+      -->
+      <cmeta:modification rdf:parseType="Resource">
+        <rdf:value>
+          Encapsulated the model under an interface component for use when
+          importing the model into a specific experiment or simulation.
+        </rdf:value>
+        <cmeta:modifier rdf:parseType="Resource">
+          <vCard:N rdf:parseType="Resource">
+            <vCard:Family>Nickerson</vCard:Family>
+            <vCard:Given>David</vCard:Given>
+            <vCard:Other>P</vCard:Other>
+          </vCard:N>
+        </cmeta:modifier>
+        <dcterms:modified rdf:parseType="Resource"> 
+          <dcterms:W3CDTF>2004-12-21</dcterms:W3CDTF>
+        </dcterms:modified>
+      </cmeta:modification>
+      <cmeta:modification rdf:parseType="Resource">
+        <rdf:value>
+          Changed units and added stimulus current.
+        </rdf:value>
+        <cmeta:modifier rdf:parseType="Resource">
+          <vCard:N rdf:parseType="Resource">
+            <vCard:Family>Nickerson</vCard:Family>
+            <vCard:Given>David</vCard:Given>
+            <vCard:Other>P</vCard:Other>
+          </vCard:N>
+        </cmeta:modifier>
+        <dcterms:modified rdf:parseType="Resource"> 
+          <dcterms:W3CDTF>2003-04-05</dcterms:W3CDTF>
+        </dcterms:modified>
+      </cmeta:modification>
+      <cmeta:modification rdf:parseType="Resource">
+        <rdf:value>
+          Changed the model name so the model loads in the database easier.
+        </rdf:value>
+        <cmeta:modifier rdf:parseType="Resource">
+          <vCard:N rdf:parseType="Resource">
+            <vCard:Family>Cuellar</vCard:Family>
+            <vCard:Given>Autumn</vCard:Given>
+            <vCard:Other>A</vCard:Other>
+          </vCard:N>
+        </cmeta:modifier>
+        <dcterms:modified rdf:parseType="Resource"> 
+          <dcterms:W3CDTF>2003-04-05</dcterms:W3CDTF>
+        </dcterms:modified>
+      </cmeta:modification>
+      <cmeta:modification rdf:parseType="Resource">
+        <rdf:value>
+          Corrected membrane_voltage_diff_eq.
+        </rdf:value>
+        <cmeta:modifier rdf:parseType="Resource">
+          <vCard:N rdf:parseType="Resource">
+            <vCard:Family>Lloyd</vCard:Family>
+            <vCard:Given>Catherine</vCard:Given>
+            <vCard:Other>May</vCard:Other>
+          </vCard:N>
+        </cmeta:modifier>
+        <dcterms:modified rdf:parseType="Resource"> 
+          <dcterms:W3CDTF>2002-02-28</dcterms:W3CDTF>
+        </dcterms:modified>
+      </cmeta:modification>
+      <cmeta:modification rdf:parseType="Resource">
+        <rdf:value>
+          Updated metadata to conform to the 16/01/2002 CellML Metadata 1.0 
+          Specification.
+        </rdf:value>
+        <cmeta:modifier rdf:parseType="Resource">
+          <vCard:N rdf:parseType="Resource">
+            <vCard:Family>Cuellar</vCard:Family>
+            <vCard:Given>Autumn</vCard:Given>
+            <vCard:Other>A.</vCard:Other>
+          </vCard:N>
+        </cmeta:modifier>
+        <dcterms:modified rdf:parseType="Resource"> 
+          <dcterms:W3CDTF>2002-01-20</dcterms:W3CDTF>
+        </dcterms:modified>
+      </cmeta:modification>
+      <!-- The Publisher metadata. -->
+      <dc:publisher>
+        Bioengineering Institute, The University of Auckland.
+      </dc:publisher>
+    </rdf:Description>
+    
+    <!--
+      The following metadata refers to the model itself, as indicated by the
+      reference to the ID "noble_model_1962", which is declared on the    
+      <model> element.
+    -->
+    <rdf:Description rdf:about="#noble_model_1962">
+      <!-- A human readable name for the model. -->
+      <dc:title>
+        The 1962 Noble Model of Purkinje Fibre Action and Pace-maker Potentials
+      </dc:title>
+
+      <!-- A comment regarding the model. -->
+      <cmeta:comment rdf:parseType="Resource">
+        <rdf:value>
+          This is the CellML description of Noble's 1962 mathematical model of
+          Purkinje fibre action and pace-maker potentials.  The equations 
+          formulated by Hodgkin and Huxley (1952) to describe the electrical 
+          activity of squid nerve have been modified to describe the action
+          and pace-maker potentials of the Purkinje fibres of the heart.
+        </rdf:value>
+        <!-- The creator of the comment. -->
+        <dc:creator rdf:parseType="Resource">
+          <vCard:FN>Catherine Lloyd</vCard:FN>
+        </dc:creator>
+      </cmeta:comment>
+
+      <!-- The model is relevant to all mammals. -->
+      <cmeta:species>Mammalia</cmeta:species>
+
+      <bqs:reference rdf:parseType="Resource">
+        <bqs:Pubmed_id>14480151</bqs:Pubmed_id>
+        <bqs:JournalArticle rdf:parseType="Resource">
+          <dc:creator rdf:parseType="Resource">
+            <bqs:Person rdf:parseType="Resource">
+              <vCard:N rdf:parseType="Resource">
+                <vCard:Family>Noble</vCard:Family>
+                <vCard:Given>Denis</vCard:Given>
+              </vCard:N>
+            </bqs:Person>
+          </dc:creator>
+          <dc:title>
+            A Modification of the Hodgkin-Huxley Equations Applicable to
+            Purkinje Fibre Action and Pace-maker Potentials
+          </dc:title>
+          <dcterms:issued rdf:parseType="Resource">
+            <dcterms:W3CDTF>1962</dcterms:W3CDTF>
+          </dcterms:issued>
+          <bqs:Journal rdf:parseType="Resource">
+            <dc:title>Journal of Physiology</dc:title>
+          </bqs:Journal>
+          <bqs:volume>160</bqs:volume>
+          <bqs:first_page>317</bqs:first_page>
+          <bqs:last_page>352</bqs:last_page>
+        </bqs:JournalArticle>
+      </bqs:reference>
+    </rdf:Description>
+  </rdf:RDF>
+
+  <!--
+    Below, we define some additional units for association with variables and
+    constants within the model. The identifiers are fairly self-explanatory.
+  -->
+  <units name="ms">
+    <unit prefix="milli" units="second" />
+  </units>
+  
+  <units name="per_ms">
+    <unit prefix="milli" units="second" exponent="-1" />
+  </units>
+
+  <units name="mV">
+    <unit prefix="milli" units="volt" />
+  </units>
+
+  <units name="per_mV">
+    <unit prefix="milli" units="volt" exponent="-1" />
+  </units>
+  
+  <units name="per_mV_ms">
+    <unit units="mV" exponent="-1" />
+    <unit units="ms" exponent="-1" />
+  </units>
+  
+  <units name="mS_per_mm2">
+    <unit prefix="milli" units="siemens" />
+    <unit prefix="milli" units="metre" exponent="-2" />
+  </units>
+
+  <units name="uF_per_mm2">
+    <unit prefix="micro" units="farad" />
+    <unit prefix="milli" units="metre" exponent="-2" />
+  </units>
+
+  <units name="uA_per_mm2">
+    <unit prefix="micro" units="ampere" />
+    <unit prefix="milli" units="metre" exponent="-2" />
+  </units>
+   
+  <component name="interface" cmeta:id="interface">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#interface">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            Here we define a component which encapsulates the entire model
+            and provides the interface to model boundary conditions and
+            outputs.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <!-- time is always a special case -->
+    <variable name="time" public_interface="in" private_interface="out" units="ms"/>
+    <!-- inputs -->
+    <variable name="I_stim" public_interface="in" private_interface="out" units="uA_per_mm2"/>
+    <variable name="g_K_add" public_interface="in" private_interface="out" units="mS_per_mm2" />
+    <!-- outputs -->
+  </component><!--interface-->
+   
+  <!--
+    The "membrane" component is really the `root' node of our model.
+    It defines the action potential variable "V" among other things.
+  -->
+  <component name="membrane" cmeta:id="membrane">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#membrane">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The main component of the model, containing the membrane currents
+            and defining the transmembrane potential.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+
+    <variable cmeta:id="Vm" name="V" initial_value="-73.8" public_interface="out" units="mV" />
+    <variable name="Cm" initial_value="0.12" units="uF_per_mm2" />
+    <variable name="time" public_interface="in" units="ms" />
+    <variable name="i_Na" public_interface="in" units="uA_per_mm2" />
+    <variable name="i_K" public_interface="in" units="uA_per_mm2" />
+    <variable name="i_Leak" public_interface="in" units="uA_per_mm2" />
+    <variable name="I_stim" public_interface="in" units="uA_per_mm2" />
+
+    <!--
+      The membrane voltage (V) is calculated as an ordinary
+      differential equation in terms of the currents.
+    -->
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#membrane_voltage_diff_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The kinetics of the transmembrane potential.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="membrane_voltage_diff_eq">
+      <apply id="membrane_voltage_diff_eq"><eq />
+        <apply><diff />
+          <bvar><ci> time </ci></bvar>
+          <ci> V </ci>
+        </apply>
+        <apply><divide />
+          <apply><minus />
+            <ci>I_stim</ci>
+            <apply><plus />
+              <ci> i_Na </ci>
+              <ci> i_K </ci>
+              <ci> i_Leak </ci>
+            </apply>
+          </apply>
+          <ci> Cm </ci>
+        </apply>
+      </apply>
+    </math>
+    
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#IStim_for_cmiss_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            This is a dummy equation that we simply use to make grabbing the
+            value easier.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <variable name="IStimC" units="uA_per_mm2" public_interface="out"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" cmeta:id="IStim_for_cmiss_eq">
+      <apply id="IStim_for_cmiss"><eq/>
+        <ci>IStimC</ci>
+        <ci>I_stim</ci>
+      </apply>
+    </math>
+  </component>
+  
+  <component name="sodium_channel" cmeta:id="sodium_channel">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#sodium_channel">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The modified sodium current from the 1952 Hodgkin Huxley model.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+
+    <variable name="i_Na" public_interface="out" units="uA_per_mm2" />
+    <variable name="g_Na_max" initial_value="4.0" units="mS_per_mm2" />
+    <variable name="g_Na" units="mS_per_mm2" />
+    <variable name="E_Na" initial_value="40.0" units="mV" />
+    <variable
+        name="time" public_interface="in"
+        private_interface="out" units="ms" />
+    <variable
+        name="V" public_interface="in"
+        private_interface="out" units="mV" />
+    <variable name="m" private_interface="in" units="dimensionless" />
+    <variable name="h" private_interface="in" units="dimensionless" />
+
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#g_Na_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            Calculation of the channel conductance.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="g_Na_calculation_eq">
+      <apply id="g_Na_calculation"><eq />
+        <ci> g_Na </ci>
+        <apply><times />
+          <apply><power />
+            <ci> m </ci>
+            <cn cellml:units="dimensionless"> 3.0 </cn>
+          </apply>
+          <ci> h </ci>
+          <ci> g_Na_max </ci>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#i_Na_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            Calculation of the channel current.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="i_Na_calculation_eq">
+      <apply id="i_Na_calculation"><eq />
+        <ci> i_Na </ci>
+        <apply><times />
+          <apply><plus />
+            <apply><times />
+              <ci> g_Na_max </ci>
+              <apply><power />
+                <ci> m </ci>
+                <cn cellml:units="dimensionless"> 3.0 </cn>
+              </apply>
+              <ci> h </ci>
+            </apply>
+            <cn cellml:units="mS_per_mm2">0.14e-2</cn>
+          </apply>
+          <apply><minus />
+            <ci> V </ci>
+            <ci> E_Na </ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+      
+  <component name="sodium_channel_m_gate" cmeta:id="sodium_channel_m_gate">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#sodium_channel_m_gate">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The voltage-dependent activation gate for the sodium channel - the m
+            gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+
+    <variable name="m" initial_value="0.05" public_interface="out" units="dimensionless" />
+    <variable name="alpha_m" units="per_ms" />
+    <variable name="beta_m" units="per_ms" />
+    <variable name="V" public_interface="in" units="mV" />
+    <variable name="time" public_interface="in" units="ms" />
+
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#alpha_m_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The opening rate for the m gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="alpha_m_calculation_eq">
+      <apply id="alpha_m_calculation"><eq />
+        <ci> alpha_m </ci>
+        <apply><divide />
+          <apply><times />
+            <cn cellml:units="per_mV_ms"> 0.1 </cn>
+            <apply><minus />
+              <apply><minus />
+                <ci> V </ci>
+              </apply>
+              <cn cellml:units="mV"> 48.0 </cn>
+            </apply>
+          </apply>
+          <apply><minus />
+            <apply><exp />
+              <apply><divide />
+                <apply><minus />
+                  <apply><minus />
+                    <ci> V </ci>
+                  </apply>
+                  <cn cellml:units="mV"> 48.0 </cn>
+                </apply>
+                <cn cellml:units="mV"> 15.0 </cn>
+              </apply>
+            </apply>
+            <cn cellml:units="dimensionless"> 1.0 </cn>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#beta_m_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The closing rate for the m gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="beta_m_calculation_eq">
+      <apply id="beta_m_calculation"><eq />
+        <ci> beta_m </ci>
+        <apply><divide />
+          <apply><times />
+            <cn cellml:units="per_mV_ms"> 0.12 </cn>
+            <apply><plus />
+              <ci> V </ci>
+              <cn cellml:units="mV"> 8.0 </cn>
+            </apply>
+          </apply>
+          <apply><minus />
+            <apply><exp />
+              <apply><divide />
+                <apply><plus />
+                  <ci> V </ci>
+                  <cn cellml:units="mV"> 8.0 </cn>
+                </apply>
+                <cn cellml:units="mV"> 5.0 </cn>
+              </apply>
+            </apply>
+            <cn cellml:units="dimensionless"> 1.0 </cn>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#dm_dt_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The kinetics of the m gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="dm_dt_eq">
+      <apply id="dm_dt"><eq />
+        <apply><diff />
+          <bvar><ci> time </ci></bvar>
+          <ci> m </ci>
+        </apply>
+        <apply><minus />
+          <apply><times />
+            <ci> alpha_m </ci>
+            <apply><minus />
+              <cn cellml:units="dimensionless"> 1.0 </cn>
+              <ci> m </ci>
+            </apply>
+          </apply>
+          <apply><times />
+            <ci> beta_m </ci>
+            <ci> m </ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  
+  <component name="sodium_channel_h_gate" cmeta:id="sodium_channel_h_gate">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#sodium_channel_h_gate">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The voltage-dependent inactivation gate for the sodium channel - the
+            h gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+
+    <variable name="h" initial_value="0.785" public_interface="out" units="dimensionless" />
+    <variable name="alpha_h" units="per_ms" />
+    <variable name="beta_h" units="per_ms" />
+    <variable name="V" public_interface="in" units="mV" />
+    <variable name="time" public_interface="in" units="ms" />
+
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#alpha_h_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The opening rate for the h gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="alpha_h_calculation_eq">
+      <apply id="alpha_h_calculation"><eq />
+        <ci> alpha_h </ci>       
+        <apply><times />
+          <cn cellml:units="per_ms"> 0.17 </cn>
+          <apply><exp />
+            <apply><divide />
+              <apply><minus />
+                <apply><minus />
+                  <ci> V </ci>
+                </apply>
+                <cn cellml:units="mV"> 90.0 </cn>
+              </apply>
+              <cn cellml:units="mV"> 20.0 </cn>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#beta_h_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The closing rate for the h gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="beta_h_calculation_eq">
+      <apply id="beta_h_calculation"><eq />
+        <ci> beta_h </ci>
+        <apply><divide />
+          <cn cellml:units="per_ms"> 1.0 </cn>
+          <apply><plus />
+            <cn cellml:units="dimensionless"> 1.0 </cn>
+            <apply><exp />
+              <apply><divide />
+                <apply><minus />
+                  <apply><minus />
+                    <ci> V </ci>
+                  </apply>
+                  <cn cellml:units="mV"> 42.0 </cn>
+                </apply>
+                <cn cellml:units="mV"> 10.0 </cn>
+              </apply>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#dh_dt_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The kinetics of the h gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="dh_dt_eq">
+      <apply id="dh_dt"><eq />
+        <apply><diff />
+          <bvar><ci> time </ci></bvar>
+          <ci> h </ci>
+        </apply>
+        <apply><minus />
+          <apply><times />
+            <ci> alpha_h </ci>
+            <apply><minus />
+              <cn cellml:units="dimensionless"> 1.0 </cn>
+              <ci> h </ci>
+            </apply>
+          </apply>
+          <apply><times />
+            <ci> beta_h </ci>
+            <ci> h </ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  
+  <component name="potassium_channel" cmeta:id="potassium_channel">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#potassium_channel">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The modified Hodgkin Huxley 1952 potassium channel.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+
+    <variable name="i_K" public_interface="out" units="uA_per_mm2" />
+    <variable name="g_K1" units="mS_per_mm2" />
+    <variable name="g_K2" units="mS_per_mm2" />
+    <variable name="g_K_add" public_interface="in" units="mS_per_mm2" />
+    <variable
+        name="time" public_interface="in"
+        private_interface="out" units="ms" />
+    <variable
+        name="V" public_interface="in"
+        private_interface="out" units="mV" />
+    <variable name="n" private_interface="in" units="dimensionless" />
+
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#i_K_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            Calculation of the potassium current. The g_K_add conductance term
+            can be used to obtain a quiescent variant of the model by setting
+            its value to 0.001 mS/mm2.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="i_K_calculation_eq">
+      <apply id="i_K_calculation"><eq />
+        <ci> i_K </ci>
+        <apply><times />
+          <apply><plus />
+            <ci> g_K1 </ci>
+            <ci> g_K2 </ci>
+            <ci> g_K_add </ci>
+          </apply>
+          <apply><plus />
+            <ci> V </ci>
+            <cn cellml:units="mV"> 100.0 </cn>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#g_K1_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The conductance of the first "type" of potassium channels present in
+            this model, using an empirical formaulation.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="g_K1_calculation_eq">
+      <apply id="g_K1_calculation"><eq />
+        <ci> g_K1 </ci>
+        <apply><plus />
+          <apply><times />
+            <cn cellml:units="mS_per_mm2"> 1.2e-2 </cn>
+            <apply><exp />
+              <apply><divide />
+                <apply><minus />
+                  <apply><minus />
+                    <ci> V </ci>
+                  </apply>
+                  <cn cellml:units="mV"> 90.0 </cn>
+                </apply>
+                <cn cellml:units="mV"> 50.0 </cn>
+              </apply>
+            </apply>
+          </apply>
+          <apply><times />
+            <cn cellml:units="mS_per_mm2"> 0.015e-2 </cn>
+            <apply><exp />
+              <apply><divide />
+                <apply><plus />
+                  <ci> V </ci>
+                  <cn cellml:units="mV"> 90.0 </cn>
+                </apply>
+                <cn cellml:units="mV"> 60.0 </cn>
+              </apply>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#g_K2_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The conductance of the second "type" of potassium channels present
+            in this model, using the Hodgkin Huxley 1952 type kinetics.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="g_K2_calculation_eq">
+      <apply id="g_K2_calculation"><eq />
+        <ci> g_K2 </ci>
+        <apply><times />
+          <cn cellml:units="mS_per_mm2"> 1.2e-2 </cn>
+          <apply><power />
+            <ci> n </ci>
+            <cn cellml:units="dimensionless"> 4.0 </cn>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+    
+  <component name="potassium_channel_n_gate" cmeta:id="potassium_channel_n_gate">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#potassium_channel_n_gate">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The voltage-dependent activation gate for the potassium channel -
+            the n gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+
+    <variable name="n" initial_value="0.0935" public_interface="out" units="dimensionless" />
+    <variable name="alpha_n" units="per_ms" />
+    <variable name="beta_n" units="per_ms" />
+    <variable name="V" public_interface="in" units="mV" />
+    <variable name="time" public_interface="in" units="ms" />
+    
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#alpha_n_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The opening rate for the n gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="alpha_n_calculation_eq">
+      <apply id="alpha_n_calculation"><eq />
+        <ci> alpha_n </ci>
+        <apply><divide />
+          <apply><times />
+            <cn cellml:units="per_mV_ms"> 0.0001 </cn>
+            <apply><minus />
+              <apply><minus />
+                <ci> V </ci>
+              </apply>
+              <cn cellml:units="mV"> 50.0 </cn>
+            </apply>
+          </apply>
+          <apply><minus />
+            <apply><exp />
+              <apply><divide />
+                <apply><minus />
+                  <apply><minus />
+                    <ci> V </ci>
+                  </apply>
+                  <cn cellml:units="mV"> 50.0 </cn>
+                </apply>
+                <cn cellml:units="mV"> 10.0 </cn>
+              </apply>
+            </apply>
+            <cn cellml:units="dimensionless"> 1.0 </cn>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#beta_n_calculation_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The closing rate for the n gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="beta_n_calculation_eq">
+      <apply id="beta_n_calculation"><eq />
+        <ci> beta_n </ci>       
+        <apply><times />
+          <cn cellml:units="per_ms"> 0.002 </cn>
+          <apply><exp />
+            <apply><divide />
+              <apply><minus />
+                <apply><minus />
+                  <ci> V </ci>
+                </apply>
+                <cn cellml:units="mV"> 90.0 </cn>
+              </apply>
+              <cn cellml:units="mV"> 80.0 </cn>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+      
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#dn_dt_eq">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The kinetics of the n gate.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <math xmlns="http://www.w3.org/1998/Math/MathML"
+      cmeta:id="dn_dt_eq">
+      <apply id="dn_dt"><eq />
+        <apply><diff />
+          <bvar><ci> time </ci></bvar>
+          <ci> n </ci>
+        </apply>
+        <apply><minus />
+          <apply><times />
+            <ci> alpha_n </ci>
+            <apply><minus />
+              <cn cellml:units="dimensionless"> 1.0 </cn>
+              <ci> n </ci>
+            </apply>
+          </apply>
+          <apply><times />
+            <ci> beta_n </ci>
+            <ci> n </ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  
+  <component name="leakage_current" cmeta:id="leakage_current">
+    <rdf:RDF
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#leakage_current">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            A non-specific background current attributed in part to chloride
+            ions. Can be turned on by specifying an appropriate value for the
+            conductance (~0.00075 mS/mm2).
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <variable name="i_Leak" public_interface="out" units="uA_per_mm2" />
+    <variable name="g_L" initial_value="0.0" units="mS_per_mm2" />
+    <variable name="E_L" initial_value="-60.0" units="mV" />
+    <variable name="time" public_interface="in" units="ms" />
+    <variable name="V" public_interface="in" units="mV" />
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply id="i_Leak_calculation"><eq />
+        <ci> i_Leak </ci>
+        <apply><times />
+          <ci> g_L </ci>
+          <apply><minus />
+            <ci> V </ci>
+            <ci> E_L </ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  
+  <group>
+    <relationship_ref relationship="containment" />
+    <component_ref component="membrane">
+      <component_ref component="sodium_channel">
+        <component_ref component="sodium_channel_m_gate" />
+        <component_ref component="sodium_channel_h_gate" />
+      </component_ref>
+      <component_ref component="potassium_channel">
+        <component_ref component="potassium_channel_n_gate" />
+      </component_ref>
+      <component_ref component="leakage_current" />
+    </component_ref>
+  </group>
+  
+  <group>
+    <relationship_ref relationship="encapsulation" />
+    <component_ref component="interface">
+      <component_ref component="membrane"/>
+      <component_ref component="sodium_channel">
+        <component_ref component="sodium_channel_m_gate" />
+        <component_ref component="sodium_channel_h_gate" />
+      </component_ref>
+      <component_ref component="potassium_channel">
+        <component_ref component="potassium_channel_n_gate" />
+      </component_ref>
+      <component_ref component="leakage_current" />
+    </component_ref>
+  </group>
+  
+  <connection>
+    <map_components
+        component_1="membrane" component_2="interface"/>
+    <map_variables variable_1="time" variable_2="time"/>
+    <map_variables variable_1="I_stim" variable_2="I_stim"/>
+  </connection>
+
+
+  <connection>
+    <map_components
+        component_1="sodium_channel" component_2="interface" />
+    <map_variables variable_1="time" variable_2="time" />
+  </connection>
+
+
+  <connection>
+    <map_components
+        component_1="potassium_channel" component_2="interface"/>
+    <map_variables variable_1="time" variable_2="time"/>
+    <map_variables variable_1="g_K_add" variable_2="g_K_add"/>
+  </connection>
+
+
+  <connection>
+    <map_components
+        component_1="leakage_current" component_2="interface" />
+    <map_variables variable_1="time" variable_2="time" />
+  </connection>
+  
+  <connection>
+    <map_components
+        component_1="membrane" component_2="sodium_channel" />
+    <map_variables variable_1="V" variable_2="V" />
+    <map_variables variable_1="i_Na" variable_2="i_Na" />
+  </connection>
+
+
+  <connection>
+    <map_components
+        component_1="membrane" component_2="potassium_channel" />
+    <map_variables variable_1="V" variable_2="V" />
+    <map_variables variable_1="i_K" variable_2="i_K" />
+  </connection>
+
+
+  <connection>
+    <map_components
+        component_1="membrane" component_2="leakage_current" />
+    <map_variables variable_1="V" variable_2="V" />
+    <map_variables variable_1="i_Leak" variable_2="i_Leak" />
+  </connection>
+  
+  <connection>
+    <map_components
+        component_1="sodium_channel" component_2="sodium_channel_m_gate" />
+    <map_variables variable_1="m" variable_2="m" />
+    <map_variables variable_1="time" variable_2="time" />
+    <map_variables variable_1="V" variable_2="V" />
+  </connection>
+
+
+  <connection>
+    <map_components
+        component_1="sodium_channel" component_2="sodium_channel_h_gate" />
+    <map_variables variable_1="h" variable_2="h" />
+    <map_variables variable_1="time" variable_2="time" />
+    <map_variables variable_1="V" variable_2="V" />
+  </connection>
+
+
+  <connection>
+    <map_components
+        component_1="potassium_channel"
+        component_2="potassium_channel_n_gate" />
+    <map_variables variable_1="n" variable_2="n" />
+    <map_variables variable_1="time" variable_2="time" />
+    <map_variables variable_1="V" variable_2="V" />
+  </connection>
+
+
+</model>

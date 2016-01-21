@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<model
+    name="1962_noble_paced"
+    cmeta:id="1962_noble_paced"
+    xmlns="http://www.cellml.org/cellml/1.1#"
+    xmlns:cellml="http://www.cellml.org/cellml/1.1#"
+    xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+      xmlns:bqs="http://www.cellml.org/bqs/1.0#"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:dcterms="http://purl.org/dc/terms/"
+      xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#"
+      xmlns:cs="http://www.cellml.org/metadata/simulation/1.0#">
+    <rdf:Description rdf:about="">
+      <dc:creator rdf:parseType="Resource">
+        <vCard:N rdf:parseType="Resource">
+          <vCard:Family>Nickerson</vCard:Family>
+          <vCard:Given>David</vCard:Given>
+        </vCard:N>
+        <vCard:EMAIL rdf:parseType="Resource">
+          <rdf:value>d.nickerson@auckland.ac.nz</rdf:value>
+          <rdf:type rdf:resource="http://imc.org/vCard/3.0#internet" />
+        </vCard:EMAIL>
+        <vCard:ORG rdf:parseType="Resource">
+          <vCard:Orgname>The University of Auckland</vCard:Orgname>
+          <vCard:Orgunit>Bioengineering Institute</vCard:Orgunit>
+        </vCard:ORG>
+      </dc:creator>
+      <dcterms:created rdf:parseType="Resource">
+        <dcterms:W3CDTF>2004-12-21</dcterms:W3CDTF>
+      </dcterms:created>
+      <dc:publisher>
+        Bioengineering Institute, The University of Auckland.
+      </dc:publisher>
+    </rdf:Description>
+    <rdf:Description rdf:about="#1962_noble_paced">
+      <dc:title>
+        Paced version of Noble (1962) Purkinje fibre model
+      </dc:title>
+      <cmeta:comment rdf:parseType="Resource">
+        <rdf:value>
+          This CellML file describes the boundary conditions used with the
+          Noble (1962) cardiac Purkinje fibre electrophysiology model to
+          produce a free running (pacemaker) version of the model.
+        </rdf:value>
+        <dc:creator rdf:parseType="Resource">
+          <vCard:FN>David Nickerson</vCard:FN>
+        </dc:creator>
+      </cmeta:comment>
+      <cs:simulation>
+        <rdf:Description rdf:ID="simulation">
+          <cs:multistepMethod>bdf</cs:multistepMethod>
+          <cs:iterationMethod>functional</cs:iterationMethod>
+          <cs:boundIntervals rdf:parseType="Collection">
+            <rdf:Description>
+              <cs:boundVariable>
+                <rdf:Description rdf:about="#time"/>
+              </cs:boundVariable>
+              <cs:maximumStepSize rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                0.01
+              </cs:maximumStepSize>
+              <cs:tabulationStepSize rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                1.0
+              </cs:tabulationStepSize>
+              <cs:startingValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                0
+              </cs:startingValue>
+              <cs:endingValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">
+                3000
+              </cs:endingValue>
+            </rdf:Description>
+          </cs:boundIntervals>
+        </rdf:Description>
+      </cs:simulation>
+    </rdf:Description>
+  </rdf:RDF>
+  
+  <import xlink:href="../../common/units.xml">
+    <units name="ms" units_ref="ms"/>
+    <units name="uA_per_mmsq" units_ref="uA_per_mmsq"/>
+    <units name="uA_per_mmcu" units_ref="uA_per_mmcu"/>
+    <units name="mV" units_ref="mV"/>
+    <units name="mS_per_mmsq" units_ref="mS_per_mmsq"/>
+    <units name="per_mm" units_ref="per_mm"/>
+  </import>
+  <import xlink:href="../1962_noble.xml">
+    <component name="model" component_ref="interface"/>
+  </import>
+  
+  <component name="time" cmeta:id="time_component">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#time_component">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            The actual definition of the time variable.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <variable name="time" cmeta:id="time" initial_value="0.0" public_interface="out" units="ms"/>
+  </component>
+  <connection>
+    <map_components component_1="model" component_2="time"/>
+    <map_variables variable_1="time" variable_2="time"/>
+  </connection>
+  
+  <component name="stimulus_protocol" cmeta:id="stimulus_protocol">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#stimulus_protocol">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            Here we define the stimulus protocol for the simulation.
+            In this case there is no stimulus applied.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <variable name="IStim" public_interface="out" units="uA_per_mmsq"/>
+    <variable name="time" public_interface="in" units="ms"/>
+    <variable name="stimPeriod" initial_value="750" units="ms"/>
+    <variable name="stimDuration" initial_value="1" units="ms"/>
+    <variable name="stimCurrent" initial_value="400" units="uA_per_mmcu"/>
+    <variable name="Am" initial_value="200" units="per_mm"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply id="stimulus_calculation"><eq />
+        <ci>IStim</ci>
+        <piecewise>
+          <piece>
+            <apply><divide/>
+              <ci>stimCurrent</ci>
+              <ci>Am</ci>
+            </apply>
+            <apply><lt/>
+              <apply><rem/>
+                <ci>time</ci>
+                <ci>stimPeriod</ci>
+              </apply>
+              <ci>stimDuration</ci>
+            </apply>
+          </piece>
+          <otherwise>
+            <cn cellml:units="uA_per_mmsq">0.0</cn>
+          </otherwise>
+        </piecewise>
+      </apply>
+    </math>
+  </component>
+  <connection>
+    <map_components component_1="model" component_2="stimulus_protocol"/>
+    <map_variables variable_1="I_stim" variable_2="IStim"/>
+  </connection>
+  <connection>
+    <map_components component_1="time" component_2="stimulus_protocol"/>
+    <map_variables variable_1="time" variable_2="time"/>
+  </connection>
+  
+  <component name="parameters" cmeta:id="parameters">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#parameters">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            Here we define the parameter values for this simulation. g_K_add
+            is used to cancel out the self-activating nature of the model.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <variable name="g_K_add" initial_value="0.001" public_interface="out" units="mS_per_mmsq"/>
+  </component>
+  <connection>
+    <map_components component_1="model" component_2="parameters"/>
+    <map_variables variable_1="g_K_add" variable_2="g_K_add"/>
+  </connection>
+  
+</model>

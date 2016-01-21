@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<model
+    name="reversal_potential"
+    cmeta:id="reversal_potential"
+    xmlns="http://www.cellml.org/cellml/1.1#"
+    xmlns:cellml="http://www.cellml.org/cellml/1.1#"
+    xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#"
+      xmlns:bqs="http://www.cellml.org/bqs/1.0#"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:dcterms="http://purl.org/dc/terms/"
+      xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#">
+    <rdf:Description rdf:about="">
+      <dc:creator rdf:parseType="Resource">
+        <vCard:N rdf:parseType="Resource">
+          <vCard:Family>Nickerson</vCard:Family>
+          <vCard:Given>David</vCard:Given>
+        </vCard:N>
+        <vCard:EMAIL rdf:parseType="Resource">
+          <rdf:value>d.nickerson@auckland.ac.nz</rdf:value>
+          <rdf:type rdf:resource="http://imc.org/vCard/3.0#internet" />
+        </vCard:EMAIL>
+        <vCard:ORG rdf:parseType="Resource">
+          <vCard:Orgname>The University of Auckland</vCard:Orgname>
+          <vCard:Orgunit>Bioengineering Institute</vCard:Orgunit>
+        </vCard:ORG>
+      </dc:creator>
+      <dcterms:created rdf:parseType="Resource">
+        <dcterms:W3CDTF>2004-12-27</dcterms:W3CDTF>
+      </dcterms:created>
+      <dc:publisher>
+        Bioengineering Institute, The University of Auckland
+      </dc:publisher>
+    </rdf:Description>
+    <rdf:Description rdf:about="#reversal_potential">
+      <dc:title>
+        Standard Nernst equlibrium potential calculation, with modifiers.
+      </dc:title>
+      <cmeta:comment rdf:parseType="Resource">
+        <rdf:value>
+          A CellML description of the standard Nernst potential calculation. We
+          describe a component for one ion and a component for two ions, with
+          modifiers.
+        </rdf:value>
+        <dc:creator rdf:parseType="Resource">
+          <vCard:FN>David Nickerson</vCard:FN>
+        </dc:creator>
+      </cmeta:comment>
+    </rdf:Description>
+  </rdf:RDF>
+  
+  <import xlink:href="units.xml">
+    <units name="K" units_ref="K"/>
+    <units name="mM" units_ref="mM"/>
+    <units name="gas_constant" units_ref="gas_constant"/>
+    <units name="faradays_constant" units_ref="faradays_constant"/>
+    <units name="mV" units_ref="mV"/>
+  </import>
+  
+  <component name="one_ion" cmeta:id="one_ion">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#one_ion">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            Calculate the Nernst reversal potential for one ionic specie. We 
+            expect the temperature, valence and ionic concentrations to be 
+            defined by the model importing this component. We make the gas 
+            and Faraday's constants available for others to use.  
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <variable name="z" public_interface="in" units="dimensionless"/>
+    <variable name="T" public_interface="in" units="K"/>
+    <variable name="intracellular_concentration" public_interface="in" units="mM"/>
+    <variable name="extracellular_concentration" public_interface="in" units="mM"/>
+    <variable name="R" public_interface="out" initial_value="8314.472" units="gas_constant"/>
+    <variable name="F" public_interface="out" initial_value="96485.0" units="faradays_constant"/>
+    <variable name="reversal_potential" public_interface="out" units="mV"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply><eq/>
+        <ci>reversal_potential</ci>
+        <apply><times/>
+          <apply><divide/>
+            <apply><times/>
+              <ci>R</ci>
+              <ci>T</ci>
+            </apply>
+            <apply><times/>
+              <ci>z</ci>
+              <ci>F</ci>
+            </apply>
+          </apply>
+          <apply><ln/>
+            <apply><divide/>
+              <ci>extracellular_concentration</ci>
+              <ci>intracellular_concentration</ci>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="two_ions" cmeta:id="two_ions">
+    <rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
+      <rdf:Description rdf:about="#two_ions">
+        <cmeta:comment rdf:parseType="Resource">
+          <rdf:value>
+            Calculate the Nernst reversal potential for two ionic species,
+            not sure how general this is but a few different models use it.
+            We expect the temperature, valence, modifiers and ionic 
+            concentrations to be defined by the model importing this 
+            component. We make the gas and Faraday's constants available for
+            others to use.
+          </rdf:value>
+        </cmeta:comment>
+      </rdf:Description>
+    </rdf:RDF>
+    <variable name="z" public_interface="in" units="dimensionless"/>
+    <variable name="T" public_interface="in" units="K"/>
+    <variable name="intracellular_concentration_1" public_interface="in" units="mM"/>
+    <variable name="extracellular_concentration_1" public_interface="in" units="mM"/>
+    <variable name="intracellular_concentration_2" public_interface="in" units="mM"/>
+    <variable name="extracellular_concentration_2" public_interface="in" units="mM"/>
+    <variable name="multiplier_1" public_interface="in" units="dimensionless"/>
+    <variable name="multiplier_2" public_interface="in" units="dimensionless"/>
+    <variable name="R" public_interface="out" initial_value="8314.472" units="gas_constant"/>
+    <variable name="F" public_interface="out" initial_value="96485.0" units="faradays_constant"/>
+    <variable name="reversal_potential" public_interface="out" units="mV"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply><eq/>
+        <ci>reversal_potential</ci>
+        <apply><times/>
+          <apply><divide/>
+            <apply><times/>
+              <ci>R</ci>
+              <ci>T</ci>
+            </apply>
+            <apply><times/>
+              <ci>z</ci>
+              <ci>F</ci>
+            </apply>
+          </apply>
+          <apply><ln/>
+            <apply><divide/>
+              <apply><plus/>
+                <apply><times/>
+                  <ci>multiplier_1</ci>
+                  <ci>extracellular_concentration_1</ci>
+                </apply>
+                <apply><times/>
+                  <ci>multiplier_2</ci>
+                  <ci>extracellular_concentration_2</ci>
+                </apply>
+              </apply>
+              <apply><plus/>
+                <apply><times/>
+                  <ci>multiplier_1</ci>
+                  <ci>intracellular_concentration_1</ci>
+                </apply>
+                <apply><times/>
+                  <ci>multiplier_2</ci>
+                  <ci>intracellular_concentration_2</ci>
+                </apply>
+              </apply>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+</model>
