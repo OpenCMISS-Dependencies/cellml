@@ -3,13 +3,14 @@ PROJECT(cellml-api VERSION 1.0 LANGUAGES Fortran CXX)
 
 option(BUILD_TESTS "${PROJECT_NAME} - Build tests" ON)
 option(PACKAGE_CONFIG_DIR "Directory for package config files (relative to CMAKE_INSTALL_PREFIX)" "lib/cmake")
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/fortran)
 
 # This is our own package
 find_package(LIBCELLML ${LIBCELLML_VERSION} REQUIRED) # gives ccgs
 find_package(LibXml2 ${LIBXML2_VERSION} REQUIRED)
 
 # Use common include directory
-set(LIBCELLML_INCLUDE_DEST include/cellml)
+set(LIBCELLML_INCLUDE_DEST include)
 
 # Probably better to not do this as it probably overrides and external value?
 if( MSVC )
@@ -57,8 +58,8 @@ endif()
 install(TARGETS cellml_model_definition EXPORT cellml-config
     DESTINATION lib
     INCLUDES DESTINATION ${LIBCELLML_INCLUDE_DEST})
-install(FILES ${CMAKE_BINARY_DIR}/cellml_model_definition.mod
-	DESTINATION ${LIBCELLML_INCLUDE_DEST}
+install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/
+    DESTINATION ${LIBCELLML_INCLUDE_DEST}
 )
 install(TARGETS cellml_api EXPORT cellml-config
     DESTINATION lib

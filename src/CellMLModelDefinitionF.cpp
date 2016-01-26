@@ -5,7 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <unistd.h>
 
 #include "occellml_config.h"
 
@@ -16,6 +15,9 @@
 #ifdef _MSC_VER
 #	include <direct.h>
 #	define getcwd _getcwd
+	#include <io.h>
+#else
+	#include <unistd.h>
 #endif
 
 static char* getAbsoluteURI(const char* uri);
