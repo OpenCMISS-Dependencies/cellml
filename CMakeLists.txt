@@ -14,7 +14,7 @@ set(LIBCELLML_INCLUDE_DEST include)
 
 # Probably better to not do this as it probably overrides and external value?
 if( MSVC )
-    add_definitions( -D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600 )    
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600 )    
 elseif(NOT MINGW)
     add_definitions(-DDYNAMIC_COMPILE)
 endif()
@@ -55,11 +55,13 @@ if(BUILD_TESTS)
 endif()
 
 # Install part
-install(TARGETS cellml_model_definition EXPORT cellml-config
+install(TARGETS cellml_model_definition 
+    EXPORT cellml-config
     DESTINATION lib
     INCLUDES DESTINATION ${LIBCELLML_INCLUDE_DEST})
 install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/
     DESTINATION ${LIBCELLML_INCLUDE_DEST}
+    FILES_MATCHING PATTERN "cellml_model_definition.mod"
 )
 install(TARGETS cellml_api EXPORT cellml-config
     DESTINATION lib
