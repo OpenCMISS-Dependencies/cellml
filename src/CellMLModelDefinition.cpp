@@ -10,6 +10,9 @@
 #  include <unistd.h>
 #  include <dlfcn.h>
 #endif
+#ifdef CELLML_USE_CSIM
+    // CSIM include
+#endif
 
 #if defined _MSC_VER || defined __MINGW32__
 #	include <direct.h>
@@ -72,6 +75,9 @@ static wchar_t* string2wstring(const char* str);
 
 CellMLModelDefinition::CellMLModelDefinition()
 {
+#ifdef CELLML_USE_CSIM
+  mCompileCommand = "THIS IS NOT USED";
+#else
   mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
   //mCompileCommand = "gcc -fPIC -g -shared -x c -o";
   mTmpDirExists = false;
@@ -79,6 +85,10 @@ CellMLModelDefinition::CellMLModelDefinition()
   mDsoFileExists = false;
   mSaveTempFiles = false;
   mInstantiated = false;
+  mCodeInformation = NULL;
+  mAnnotations = NULL;
+  mCevas = NULL;
+#endif
   nBound = -1;
   nRates = -1;
   nAlgebraic = -1;
@@ -90,14 +100,14 @@ CellMLModelDefinition::CellMLModelDefinition()
   mIntermediateCounter = 0;
   mParameterCounter = 0;
   mModel = NULL;
-  mCodeInformation = NULL;
-  mAnnotations = NULL;
-  mCevas = NULL;
 }
 
 CellMLModelDefinition::CellMLModelDefinition(const char* url) :
 		mURL(url)
 {
+#ifdef CELLML_USE_CSIM
+  mCompileCommand = "THIS IS NOT USED";
+#else
   mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
   //mCompileCommand = "gcc -fPIC -g -shared -x c -o";
   mTmpDirExists = false;
@@ -105,6 +115,10 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   mDsoFileExists = false;
   mSaveTempFiles = false;
   mInstantiated = false;
+  mCodeInformation = NULL;
+  mAnnotations = NULL;
+  mCevas = NULL;
+#endif
   nBound = -1;
   nRates = -1;
   nAlgebraic = -1;
@@ -116,13 +130,22 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   mIntermediateCounter = 0;
   mParameterCounter = 0;
   mModel = NULL;
-  mCodeInformation = NULL;
-  mAnnotations = NULL;
-  mCevas = NULL;
   std::cout << "Creating CellMLModelDefinition from the URL: " 
 	    << url << std::endl;
   if (! mURL.empty())
   {
+#ifdef CELLML_USE_CSIM
+    csim::Model* model = new csim::Model();
+    if (model->loadCellmlModel(mUrl) == 0)
+    {
+        mModel = static_cast<void*>(model);
+    }
+    else
+    {
+        std::cerr << "Error loading the model into CSim: " << url << std::endl;
+        mModel = static_cast<void*>(NULL);
+    }
+#else
     //std::cout << "Have a valid simulation description." << std::endl;
     //std::cout << "  CellML model URI: " << mURL.c_str() << std::endl;
     RETURN_INTO_WSTRING(URL,string2wstring(mURL.c_str()));
@@ -210,11 +233,19 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
       std::wcerr << L"Error loading model URL: " << URL.c_str() << std::endl;
       mModel = static_cast<void*>(NULL);
     }
+#endif
   }
 }
 
 CellMLModelDefinition::~CellMLModelDefinition()
 {
+#ifdef CELLML_USE_CSIM
+  if (mModel)
+  {
+      csim::Model* model = static_cast<csim::Model*>(mModel);
+      delete model;
+  }
+#else
   if (mAnnotations)
   {
     iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(mAnnotations);
@@ -259,11 +290,16 @@ CellMLModelDefinition::~CellMLModelDefinition()
     else std::cout << "Leaving generated temporary directory: "
 		   << mTmpDirName.c_str() << std::endl;
   }
+#endif
 }
 
 int CellMLModelDefinition::getInitialValue(const char* name,double* value)
 {
   int code = -1;
+#ifdef CELLML_USE_CSIM
+  std::cerr << "CellMLModelDefintion::getInitialValue: Sorry, not implemented yet." << std::endl;
+  code = -11;
+#else
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model)
   {
@@ -298,11 +334,16 @@ int CellMLModelDefinition::getInitialValue(const char* name,double* value)
     std::cerr << "CellMLModelDefinition::getInitialValue -- variable " << name << " has no initial value." << std::endl;
     code = -4;
   }
+#endif
   return code;
 }
 
 int CellMLModelDefinition::getInitialValueByIndex(const int type,const int index,double* value)
 {
+#ifdef CELLML_USE_CSIM
+    std::cerr << "CellMLModelDefintion::getInitialValueByIndex: Sorry, not implemented yet." << std::endl;
+    return -11;
+#else
   std::map<std::pair<int, int>, double>::iterator i =
     mInitialValues.find(std::pair<int, int>(type, index));
 
@@ -315,6 +356,7 @@ int CellMLModelDefinition::getInitialValueByIndex(const int type,const int index
 
   *value = i->second;
   return 0;
+#endif
 }
 
 int CellMLModelDefinition::getVariableType(const char* name,int* type)

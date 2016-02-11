@@ -1,13 +1,22 @@
 cmake_minimum_required(VERSION 3.1)
-PROJECT(cellml-api VERSION 1.0 LANGUAGES Fortran CXX)
+PROJECT(cellml-api VERSION 1.1 LANGUAGES Fortran CXX)
 
 option(BUILD_TESTS "${PROJECT_NAME} - Build tests" ON)
 option(PACKAGE_CONFIG_DIR "Directory for package config files (relative to CMAKE_INSTALL_PREFIX)" "lib/cmake")
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/fortran)
 
+# Is this the best place for this?
+# FIXME: Need to get this to work with DYNAMIC_COMPILE
+option(CELLML_USE_CSIM "${PROJECT_NAME} - Use CSim to handle CellML models." ON)
+
 # This is our own package
-find_package(LIBCELLML ${LIBCELLML_VERSION} REQUIRED) # gives ccgs
-find_package(LibXml2 ${LIBXML2_VERSION} REQUIRED)
+if(CELLML_USE_CSIM)
+    find_package(CSim ${CSim_VERSION} REQUIRED)
+    add_definitions(-DCELLML_USE_CSIM)
+else()
+    find_package(LIBCELLML ${LIBCELLML_VERSION} REQUIRED) # gives ccgs
+    find_package(LibXml2 ${LIBXML2_VERSION} REQUIRED)
+endif(CELLML_USE_CSIM)
 
 # Use common include directory
 set(LIBCELLML_INCLUDE_DEST include)
