@@ -150,6 +150,7 @@ class CellMLModelDefinition
     double* WANTED,double* KNOWN);
 
  private:
+#ifndef CELLML_USE_CSIM
   /**
    * Generate C code for the given CellML model.
    * @param model The CellML model for which to generate C code.
@@ -158,9 +159,11 @@ class CellMLModelDefinition
    * @return The generated code, if successful; and empty string otherwise.
    */
   std::wstring getModelAsCCode(void* model,void* cevas,void* annotations);
+#endif
   int flagVariable(const char* name, int type,
                    std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount);
   std::string mURL;
+#ifndef CELLML_USE_CSIM
   std::string mTmpDirName;
   bool mTmpDirExists;
   std::string mCodeFileName;
@@ -168,9 +171,10 @@ class CellMLModelDefinition
   std::string mDsoFileName;
   bool mDsoFileExists;
   std::string mCompileCommand;
+  bool mInstantiated;
+#endif
   bool mSaveTempFiles;
   void* mHandle;
-  bool mInstantiated;
   std::map<std::pair<int,int>, double> mInitialValues;
   std::map<std::string, int> mVariableTypes;
   std::map<std::string, int> mVariableIndices;
@@ -178,9 +182,11 @@ class CellMLModelDefinition
   // need to access these?
  public:
   void* mModel;
+#ifndef CELLML_USE_CSIM
   void* mCodeInformation;
   void* mAnnotations;
   void* mCevas;
+#endif
   int mNumberOfWantedVariables;
   int mNumberOfKnownVariables;
   int mNumberOfIndependentVariables;
