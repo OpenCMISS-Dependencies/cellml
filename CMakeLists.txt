@@ -11,19 +11,18 @@ option(CELLML_USE_CSIM "${PROJECT_NAME} - Use CSim to handle CellML models." ON)
 
 # This is our own package
 if(CELLML_USE_CSIM)
-    find_package(CSim ${CSim_VERSION} REQUIRED)
-    add_definitions(-DCELLML_USE_CSIM)
+    find_package(CSim ${CSIM_VERSION} CONFIG REQUIRED)
 else()
     find_package(LIBCELLML ${LIBCELLML_VERSION} REQUIRED) # gives ccgs
     find_package(LibXml2 ${LIBXML2_VERSION} REQUIRED)
-endif(CELLML_USE_CSIM)
+endif()
 
 # Use common include directory
 set(LIBCELLML_INCLUDE_DEST include)
 
 # Probably better to not do this as it probably overrides and external value?
 if( MSVC )
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600 )    
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -DWINVER=0x0600)
 elseif(NOT MINGW)
     add_definitions(-DDYNAMIC_COMPILE)
 endif()
@@ -39,12 +38,15 @@ SET(cellml-api-src
   src/ccgs_required_functions.cpp
 )
 
-# need to handle the fortran code specially?
-
 add_library(cellml_api ${cellml-api-src})
-target_link_libraries(cellml_api PUBLIC ccgs xml2)
+if (CELLML_USE_CSIM)
+    target_compile_definitions(cellml_api PUBLIC $<BUILD_INTERFACE:CELLML_USE_CSIM>)
+    target_link_libraries(cellml_api PUBLIC csim)
+else()
+    target_link_libraries(cellml_api PUBLIC ccgs xml2)
+endif()
 add_library(cellml_model_definition src/cellml_model_definition.f90)
-target_link_libraries(cellml_model_definition LINK_INTERFACE_LIBRARIES cellml_api)
+target_link_libraries(cellml_model_definition INTERFACE cellml_api)
 
 # Testing executables
 if(BUILD_TESTS)
@@ -81,9 +83,18 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(${CMAKE_CURRENT_BINARY_DIR}/cellml-config-versi
     COMPATIBILITY AnyNewerVersion)
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake 
     "include(CMakeFindDependencyMacro)\r\n"
-	"set(${PROJECT_NAME}_IMPORT_PREFIX \${_IMPORT_PREFIX})\r\n"
-    "find_dependency(LIBCELLML ${LIBCELLML_VERSION})\r\n"
-    "find_dependency(LibXml2 ${LIBXML2_VERSION})\r\n"
+	"set(${PROJECT_NAME}_IMPORT_PREFIX \${_IMPORT_PREFIX})\r\n")
+if (CELLML_USE_CSIM)
+    file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake	
+        "find_dependency(CSim ${CSIM_VERSION})\r\n"
+    )
+else()
+    file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake	
+        "find_dependency(LIBCELLML ${LIBCELLML_VERSION})\r\n"
+        "find_dependency(LibXml2 ${LIBXML2_VERSION})\r\n"
+    )
+endif()
+file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake
     "set(_IMPORT_PREFIX \${${PROJECT_NAME}_IMPORT_PREFIX})"
 )
 install(FILES 

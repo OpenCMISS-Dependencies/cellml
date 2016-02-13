@@ -5,6 +5,10 @@
 #include <vector>
 #include <IfaceCCGS.hxx>
 
+#ifdef CELLML_USE_CSIM
+#include "csim/model.h"
+#endif
+
 /**
  * The primary object used to define a CellML model for use in openCMISS.
  *
@@ -95,6 +99,7 @@ class CellMLModelDefinition
    */
   int instantiate();
 
+#ifndef CELLML_USE_CSIM
   /**
    * Set the compile command to use to compile the generated code into a dynamic shared object.
    * @param command The compile command.
@@ -111,6 +116,7 @@ class CellMLModelDefinition
   {
     return mCompileCommand;
   }
+#endif
 
   /**
    * Set the save temporary files flag.
@@ -129,14 +135,12 @@ class CellMLModelDefinition
     return mSaveTempFiles;
   }
 
+
   /**
    * Check model instantiation.
    * @return True if the model is instantiated; false otherwise.
    */
-  bool instantiated()
-  {
-    return mInstantiated;
-  }
+  bool instantiated();
 
   int32_t nBound;
   int32_t nRates;
@@ -160,10 +164,14 @@ class CellMLModelDefinition
    */
   std::wstring getModelAsCCode(void* model,void* cevas,void* annotations);
 #endif
+
   int flagVariable(const char* name, int type,
                    std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount);
   std::string mURL;
-#ifndef CELLML_USE_CSIM
+
+#ifdef CELLML_USE_CSIM
+  csim::Model* model;
+#else
   std::string mTmpDirName;
   bool mTmpDirExists;
   std::string mCodeFileName;
@@ -173,6 +181,7 @@ class CellMLModelDefinition
   std::string mCompileCommand;
   bool mInstantiated;
 #endif
+
   bool mSaveTempFiles;
   void* mHandle;
   std::map<std::pair<int,int>, double> mInitialValues;

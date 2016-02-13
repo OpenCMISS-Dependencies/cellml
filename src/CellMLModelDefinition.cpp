@@ -10,9 +10,6 @@
 #  include <unistd.h>
 #  include <dlfcn.h>
 #endif
-#ifdef CELLML_USE_CSIM
-    // CSIM include
-#endif
 
 #if defined _MSC_VER || defined __MINGW32__
 #	include <direct.h>
@@ -75,9 +72,7 @@ static wchar_t* string2wstring(const char* str);
 
 CellMLModelDefinition::CellMLModelDefinition()
 {
-#ifdef CELLML_USE_CSIM
-  mCompileCommand = "THIS IS NOT USED";
-#else
+#ifndef CELLML_USE_CSIM
   mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
   //mCompileCommand = "gcc -fPIC -g -shared -x c -o";
   mTmpDirExists = false;
@@ -105,9 +100,7 @@ CellMLModelDefinition::CellMLModelDefinition()
 CellMLModelDefinition::CellMLModelDefinition(const char* url) :
 		mURL(url)
 {
-#ifdef CELLML_USE_CSIM
-  mCompileCommand = "THIS IS NOT USED";
-#else
+#ifndef CELLML_USE_CSIM
   mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
   //mCompileCommand = "gcc -fPIC -g -shared -x c -o";
   mTmpDirExists = false;
@@ -135,8 +128,8 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   if (! mURL.empty())
   {
 #ifdef CELLML_USE_CSIM
-    csim::Model* model = new csim::Model();
-    if (model->loadCellmlModel(mUrl) == 0)
+    model = new csim::Model();
+    if (model->loadCellmlModel(mURL) == 0)
     {
         mModel = static_cast<void*>(model);
     }
@@ -240,8 +233,10 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
 CellMLModelDefinition::~CellMLModelDefinition()
 {
 #ifdef CELLML_USE_CSIM
+	delete model;
   if (mModel)
   {
+	  // Isnt this gonna blow?
       csim::Model* model = static_cast<csim::Model*>(mModel);
       delete model;
   }
@@ -359,8 +354,21 @@ int CellMLModelDefinition::getInitialValueByIndex(const int type,const int index
 #endif
 }
 
+bool CellMLModelDefinition::instantiated()
+{
+#ifdef CELLML_USE_CSIM
+	return model->isInstantiated();
+#else
+	return mInstantiated;
+#endif
+}
+
 int CellMLModelDefinition::getVariableType(const char* name,int* type)
 {
+#ifdef CELLML_USE_CSIM
+	std::cerr << "CellMLModelDefinition::getVariableType -- not implemented with CSim" << std::endl;
+	return -2;
+#else
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model && !mCodeInformation && !mAnnotations)
   {
@@ -384,10 +392,15 @@ int CellMLModelDefinition::getVariableType(const char* name,int* type)
 
   *type = i->second;
   return 0;
+#endif
 }
 
 int CellMLModelDefinition::getVariableIndex(const char* name,int* index)
 {
+#ifdef CELLML_USE_CSIM
+	std::cerr << "CellMLModelDefinition::getVariableIndex -- not implemented with CSim" << std::endl;
+	return -2;
+#else
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model && !mCodeInformation && !mAnnotations)
   {
@@ -411,6 +424,7 @@ int CellMLModelDefinition::getVariableIndex(const char* name,int* index)
 
   *index = i->second;
   return 0;
+#endif
 }
 
 int CellMLModelDefinition::flagVariable
@@ -419,6 +433,10 @@ int CellMLModelDefinition::flagVariable
  std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount
 )
 {
+#ifdef CELLML_USE_CSIM
+	std::cerr << "CellMLModelDefinition::flagVariable -- not implemented with CSim" << std::endl;
+	return -2;
+#else
   if (!mCodeInformation)
   {
     std::cerr << "CellMLModelDefinition::flagVariable -- missing model?" << std::endl;
@@ -536,6 +554,7 @@ int CellMLModelDefinition::flagVariable
   }
   ct->release_ref();
   return 0;
+#endif
 }
 
 int CellMLModelDefinition::setVariableAsKnown(const char* name)
@@ -566,6 +585,9 @@ int CellMLModelDefinition::setVariableAsWanted(const char* name)
 
 int CellMLModelDefinition::instantiate()
 {
+#ifdef CELLML_USE_CSIM
+	return model->instantiate();
+#else
   int code = -1;
   std::wstring codeString = getModelAsCCode(mModel,mCevas,mAnnotations);
   if (codeString.length() > 1)
@@ -645,6 +667,7 @@ int CellMLModelDefinition::instantiate()
     code = -3;
   }
   return code;
+#endif
 }
 
 /*
@@ -782,6 +805,7 @@ static void clearCodeAssignments(std::wstring& s,const wchar_t* array,int count)
   }
 }
 
+#ifndef CELLML_USE_CSIM
 std::wstring 
 CellMLModelDefinition::getModelAsCCode(void* _model,void* _cevas,void* _annotations)
 {
@@ -1143,3 +1167,4 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _cevas,void* _annotati
   }
   return code;
 }
+#endif
