@@ -27,9 +27,9 @@ elseif(NOT MINGW)
     add_definitions(-DDYNAMIC_COMPILE)
 endif()
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-Wall -Werror" W_FLAGS)
+CHECK_CXX_COMPILER_FLAG("-Wall" W_FLAGS)
 if (W_FLAGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
 SET(cellml-api-src
