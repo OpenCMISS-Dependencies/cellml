@@ -183,7 +183,6 @@ class CellMLModelDefinition
 #endif
 
   bool mSaveTempFiles;
-  void* mHandle;
   std::map<std::pair<int,int>, double> mInitialValues;
   std::map<std::string, int> mVariableTypes;
   std::map<std::string, int> mVariableIndices;
@@ -192,6 +191,7 @@ class CellMLModelDefinition
  public:
   void* mModel;
 #ifndef CELLML_USE_CSIM
+  void* mHandle;
   void* mCodeInformation;
   void* mAnnotations;
   void* mCevas;
