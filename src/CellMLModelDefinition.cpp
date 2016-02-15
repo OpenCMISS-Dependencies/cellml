@@ -425,8 +425,19 @@ int CellMLModelDefinition::getVariableType(const char* name,int* type)
 int CellMLModelDefinition::getVariableIndex(const char* name,int* index)
 {
 #ifdef CELLML_USE_CSIM
-	std::cerr << "CellMLModelDefinition::getVariableIndex -- not implemented with CSim" << std::endl;
-	return -2;
+    // CSim allows variables to have multiple types and each type would have a different index. Here we collapse this
+    // down to those relevant to OpenCMISS.
+    int vt = -1;
+    if (getVariableType(name, &vt) == 0)
+    {
+        if (vt == StateType) *index = model->getVariableIndex(name, csim::StateType);
+        else if (vt == KnownType) *index = model->getVariableIndex(name, csim::InputType);
+        else if (vt == WantedType) *index = model->getVariableIndex(name, csim::OutputType);
+        else *index = model->getVariableIndex(name, csim::IndependentType);
+        return 0;
+    }
+    std::cerr << "CellMLModelDefinition::getVariableIndex -- unable to get the type of variable " << name << std::endl;
+    return -1;
 #else
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model && !mCodeInformation && !mAnnotations)
