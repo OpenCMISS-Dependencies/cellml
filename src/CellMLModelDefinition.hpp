@@ -147,14 +147,24 @@ class CellMLModelDefinition
   int32_t nAlgebraic;
   int32_t nConstants;
 
+  inline void callModelFunction(double VOI,double* STATES,double* RATES,
+                                double* WANTED,double* KNOWN)
+  {
+#ifdef CELLML_USE_CSIM
+      mModelFunction(VOI, STATES, RATES, WANTED, KNOWN);
+#else
+      rhsRoutine(VOI, STATES, RATES, WANTED, KNOWN);
+#endif
+  }
+
+ private:
+#ifndef CELLML_USE_CSIM
   // loaded from the generated and compiled DSO
   /* Compute the RHS of the system of the ODE system
    */
   void (*rhsRoutine)(double VOI,double* STATES,double* RATES,
     double* WANTED,double* KNOWN);
 
- private:
-#ifndef CELLML_USE_CSIM
   /**
    * Generate C code for the given CellML model.
    * @param model The CellML model for which to generate C code.
@@ -171,6 +181,9 @@ class CellMLModelDefinition
 
 #ifdef CELLML_USE_CSIM
   csim::Model* model;
+  csim::InitialiseFunction mInitialiseFunction;
+  csim::ModelFunction mModelFunction;
+  std::vector<double> mInitStates, mInitWanted, mInitKnown;
 #else
   std::string mTmpDirName;
   bool mTmpDirExists;

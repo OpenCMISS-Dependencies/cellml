@@ -16,8 +16,9 @@
 #endif
 
 #ifdef CELLML_USE_CSIM
-#include "csim/variable_types.h"
-#include "csim/error_codes.h"
+#  include "csim/variable_types.h"
+#  include "csim/error_codes.h"
+#  include "csim/executable_functions.h"
 #endif
 
 /* needs to be before CellML headers to avoid conflict with uint32_t in cda_config.h */
@@ -301,12 +302,23 @@ CellMLModelDefinition::~CellMLModelDefinition()
 #endif
 }
 
-int CellMLModelDefinition::getInitialValue(const char* name,double* value)
+int CellMLModelDefinition::getInitialValue(const char* name, double* value)
 {
   int code = -1;
 #ifdef CELLML_USE_CSIM
-  std::cerr << "CellMLModelDefintion::getInitialValue: Sorry, not implemented yet." << std::endl;
-  code = -11;
+  int vt;
+  if (getVariableType(name, &vt) != 0)
+  {
+      std::cerr << "CellMLModelDefintion::getInitialValue(name) - unable to get variable type: " << name << std::endl;
+      return -1;
+  }
+  int idx = -1;
+  if (getVariableIndex(name, &idx) != 0)
+  {
+      std::cerr << "CellMLModelDefintion::getInitialValue(name) - unable to get variable index: " << name << std::endl;
+      return -2;
+  }
+  return getInitialValueByIndex(vt, idx, value);
 #else
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model)
@@ -346,11 +358,24 @@ int CellMLModelDefinition::getInitialValue(const char* name,double* value)
   return code;
 }
 
-int CellMLModelDefinition::getInitialValueByIndex(const int type,const int index,double* value)
+int CellMLModelDefinition::getInitialValueByIndex(const int type, const int index, double* value)
 {
 #ifdef CELLML_USE_CSIM
-    std::cerr << "CellMLModelDefintion::getInitialValueByIndex: Sorry, not implemented yet." << std::endl;
-    return -11;
+    switch (type)
+    {
+    case StateType:
+        *value = mInitStates[index];
+        break;
+    case WantedType:
+        *value = mInitWanted[index];
+        break;
+    case KnownType:
+        *value = mInitKnown[index];
+        break;
+    default:
+        *value = 0.0;
+    }
+    return 0;
 #else
   std::map<std::pair<int, int>, double>::iterator i =
     mInitialValues.find(std::pair<int, int>(type, index));
@@ -647,7 +672,15 @@ int CellMLModelDefinition::instantiate()
         mParameterCounter = nConstants;
         mStateCounter = nRates;
         mIntermediateCounter = nAlgebraic;
-        std::cout << "instantiated: " << nBound << "; " << nRates << "; " << nAlgebraic << "; " << nConstants << std::endl;
+        mInitialiseFunction = model->getInitialiseFunction();
+        // call the initialise function to get all the initial values - better than relying on initial_value attributes
+        // in the CellML model?
+        mInitKnown = std::vector<double>(mParameterCounter);
+        mInitWanted = std::vector<double>(mIntermediateCounter);
+        mInitStates = std::vector<double>(mStateCounter);
+        mInitialiseFunction(mInitStates.data(), mInitWanted.data(), mInitKnown.data());
+        // save the pointer to the RHS routine.
+        mModelFunction = model->getModelFunction();
         return 0;
     }
     std::cerr << "CellMLModelDefinition::instantiate: unable to instantiate the CSim model: " << code << std::endl;

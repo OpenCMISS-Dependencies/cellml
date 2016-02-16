@@ -265,7 +265,7 @@ void cellml_model_definition_call_rhs_routine_f(void* _ptr,
 {
   // no error checks to optimise?
   CellMLModelDefinition* def = (CellMLModelDefinition*)_ptr;
-  def->rhsRoutine(voi,states,rates,wanted,known);
+  def->callModelFunction(voi,states,rates,wanted,known);
 }
 
 static char* getAbsoluteURI(const char* uri)
