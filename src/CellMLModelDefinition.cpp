@@ -17,6 +17,7 @@
 
 #ifdef CELLML_USE_CSIM
 #include "csim/variable_types.h"
+#include "csim/error_codes.h"
 #endif
 
 /* needs to be before CellML headers to avoid conflict with uint32_t in cda_config.h */
@@ -636,7 +637,21 @@ int CellMLModelDefinition::setVariableAsWanted(const char* name)
 int CellMLModelDefinition::instantiate()
 {
 #ifdef CELLML_USE_CSIM
-	return model->instantiate();
+    int code = model->instantiate();
+    if (code == csim::CSIM_OK)
+    {
+        nBound = 1;
+        nRates = model->numberOfStateVariables();
+        nAlgebraic = model->numberOfOutputVariables();
+        nConstants = model->numberOfInputVariables();
+        mParameterCounter = nConstants;
+        mStateCounter = nRates;
+        mIntermediateCounter = nAlgebraic;
+        std::cout << "instantiated: " << nBound << "; " << nRates << "; " << nAlgebraic << "; " << nConstants << std::endl;
+        return 0;
+    }
+    std::cerr << "CellMLModelDefinition::instantiate: unable to instantiate the CSim model: " << code << std::endl;
+    return code;
 #else
   int code = -1;
   std::wstring codeString = getModelAsCCode(mModel,mCevas,mAnnotations);
