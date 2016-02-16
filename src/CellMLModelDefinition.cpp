@@ -15,6 +15,12 @@
 #	include <direct.h>
 #endif
 
+#ifdef CELLML_USE_CSIM
+#  include "csim/variable_types.h"
+#  include "csim/error_codes.h"
+#  include "csim/executable_functions.h"
+#endif
+
 /* needs to be before CellML headers to avoid conflict with uint32_t in cda_config.h */
 #include "occellml_config.h"
 
@@ -30,11 +36,14 @@
 
 #include "CellMLModelDefinition.hpp"
 
-#define StateType 1
-#define KnownType 2
-#define WantedType 3
-#define IndependentType 4
+enum {
+    StateType = 1,
+    KnownType = 2,
+    WantedType = 3,
+    IndependentType = 4
+};
 
+#ifndef CELLML_USE_CSIM
 static void
 operator<<(std::ostream& data, const std::wstring& str)
 {
@@ -44,20 +53,27 @@ operator<<(std::ostream& data, const std::wstring& str)
   data << buf;
   delete [] buf;
 }
+#endif
 
 /*
  * Prototype local methods
  */
+#ifndef CELLML_USE_CSIM
 typedef std::pair<std::string,std::string> CVpair;
 static CVpair splitName(const char* s);
 static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::Model* model,void* _cevas, const char* name);
+#endif
 
+#ifndef CELLML_USE_CSIM
 static std::wstring formatNumber(const int value)
 {
   wchar_t valueString[100];
   swprintf(valueString,100,L"%d",value);
   return std::wstring(valueString);
-}/*
+}
+#endif
+
+/*
 static std::wstring formatNumber(const uint32_t value)
 {
   wchar_t valueString[100];
@@ -67,11 +83,15 @@ static std::wstring formatNumber(const uint32_t value)
 #if 0
 static char* getURIFromURIWithFragmentID(const char* uri);
 #endif
+
+#ifndef CELLML_USE_CSIM
 //static char* wstring2string(const wchar_t* str);
 static wchar_t* string2wstring(const char* str);
+#endif
 
 CellMLModelDefinition::CellMLModelDefinition()
 {
+#ifndef CELLML_USE_CSIM
   mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
   //mCompileCommand = "gcc -fPIC -g -shared -x c -o";
   mTmpDirExists = false;
@@ -79,6 +99,10 @@ CellMLModelDefinition::CellMLModelDefinition()
   mDsoFileExists = false;
   mSaveTempFiles = false;
   mInstantiated = false;
+  mCodeInformation = NULL;
+  mAnnotations = NULL;
+  mCevas = NULL;
+#endif
   nBound = -1;
   nRates = -1;
   nAlgebraic = -1;
@@ -90,14 +114,12 @@ CellMLModelDefinition::CellMLModelDefinition()
   mIntermediateCounter = 0;
   mParameterCounter = 0;
   mModel = NULL;
-  mCodeInformation = NULL;
-  mAnnotations = NULL;
-  mCevas = NULL;
 }
 
 CellMLModelDefinition::CellMLModelDefinition(const char* url) :
 		mURL(url)
 {
+#ifndef CELLML_USE_CSIM
   mCompileCommand = "gcc -fPIC -O3 -shared -x c -o";
   //mCompileCommand = "gcc -fPIC -g -shared -x c -o";
   mTmpDirExists = false;
@@ -105,6 +127,10 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   mDsoFileExists = false;
   mSaveTempFiles = false;
   mInstantiated = false;
+  mCodeInformation = NULL;
+  mAnnotations = NULL;
+  mCevas = NULL;
+#endif
   nBound = -1;
   nRates = -1;
   nAlgebraic = -1;
@@ -116,13 +142,23 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   mIntermediateCounter = 0;
   mParameterCounter = 0;
   mModel = NULL;
-  mCodeInformation = NULL;
-  mAnnotations = NULL;
-  mCevas = NULL;
   std::cout << "Creating CellMLModelDefinition from the URL: " 
 	    << url << std::endl;
   if (! mURL.empty())
   {
+#ifdef CELLML_USE_CSIM
+    model = new csim::Model();
+    if (model->loadCellmlModel(mURL) == 0)
+    {
+        // success, do nothing?
+    }
+    else
+    {
+        std::cerr << "Error loading the model into CSim: " << url << std::endl;
+        delete model;
+        model = static_cast<csim::Model*>(NULL);
+    }
+#else
     //std::cout << "Have a valid simulation description." << std::endl;
     //std::cout << "  CellML model URI: " << mURL.c_str() << std::endl;
     RETURN_INTO_WSTRING(URL,string2wstring(mURL.c_str()));
@@ -210,11 +246,15 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
       std::wcerr << L"Error loading model URL: " << URL.c_str() << std::endl;
       mModel = static_cast<void*>(NULL);
     }
+#endif
   }
 }
 
 CellMLModelDefinition::~CellMLModelDefinition()
 {
+#ifdef CELLML_USE_CSIM
+    if (model) delete model;
+#else
   if (mAnnotations)
   {
     iface::cellml_services::AnnotationSet* as = static_cast<iface::cellml_services::AnnotationSet*>(mAnnotations);
@@ -259,11 +299,27 @@ CellMLModelDefinition::~CellMLModelDefinition()
     else std::cout << "Leaving generated temporary directory: "
 		   << mTmpDirName.c_str() << std::endl;
   }
+#endif
 }
 
-int CellMLModelDefinition::getInitialValue(const char* name,double* value)
+int CellMLModelDefinition::getInitialValue(const char* name, double* value)
 {
   int code = -1;
+#ifdef CELLML_USE_CSIM
+  int vt;
+  if (getVariableType(name, &vt) != 0)
+  {
+      std::cerr << "CellMLModelDefintion::getInitialValue(name) - unable to get variable type: " << name << std::endl;
+      return -1;
+  }
+  int idx = -1;
+  if (getVariableIndex(name, &idx) != 0)
+  {
+      std::cerr << "CellMLModelDefintion::getInitialValue(name) - unable to get variable index: " << name << std::endl;
+      return -2;
+  }
+  return getInitialValueByIndex(vt, idx, value);
+#else
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model)
   {
@@ -298,11 +354,29 @@ int CellMLModelDefinition::getInitialValue(const char* name,double* value)
     std::cerr << "CellMLModelDefinition::getInitialValue -- variable " << name << " has no initial value." << std::endl;
     code = -4;
   }
+#endif
   return code;
 }
 
-int CellMLModelDefinition::getInitialValueByIndex(const int type,const int index,double* value)
+int CellMLModelDefinition::getInitialValueByIndex(const int type, const int index, double* value)
 {
+#ifdef CELLML_USE_CSIM
+    switch (type)
+    {
+    case StateType:
+        *value = mInitStates[index];
+        break;
+    case WantedType:
+        *value = mInitWanted[index];
+        break;
+    case KnownType:
+        *value = mInitKnown[index];
+        break;
+    default:
+        *value = 0.0;
+    }
+    return 0;
+#else
   std::map<std::pair<int, int>, double>::iterator i =
     mInitialValues.find(std::pair<int, int>(type, index));
 
@@ -315,10 +389,39 @@ int CellMLModelDefinition::getInitialValueByIndex(const int type,const int index
 
   *value = i->second;
   return 0;
+#endif
+}
+
+bool CellMLModelDefinition::instantiated()
+{
+#ifdef CELLML_USE_CSIM
+	return model->isInstantiated();
+#else
+	return mInstantiated;
+#endif
 }
 
 int CellMLModelDefinition::getVariableType(const char* name,int* type)
 {
+#ifdef CELLML_USE_CSIM
+    unsigned char vt = model->getVariableType(name);
+    if (vt == csim::UndefinedType)
+    {
+        std::cerr << "CellMLModelDefinition::getVariableType -- undefined type" << std::endl;
+        return -2;
+    }
+    // CSim allows variables to have multiple types, here we restrict to just the most "important" type for OpenCMISS
+    if (vt & csim::StateType) *type = StateType;
+    else if (vt & csim::OutputType) *type = WantedType;
+    else if (vt & csim::InputType) *type = KnownType;
+    else if (vt & csim::IndependentType) *type = IndependentType;
+    else
+    {
+        std::cerr << "CellMLModelDefinition::getVariableType -- unkown type found? (" << vt << ")" << std::endl;
+        return -3;
+    }
+    return 0;
+#else
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model && !mCodeInformation && !mAnnotations)
   {
@@ -342,10 +445,26 @@ int CellMLModelDefinition::getVariableType(const char* name,int* type)
 
   *type = i->second;
   return 0;
+#endif
 }
 
 int CellMLModelDefinition::getVariableIndex(const char* name,int* index)
 {
+#ifdef CELLML_USE_CSIM
+    // CSim allows variables to have multiple types and each type would have a different index. Here we collapse this
+    // down to those relevant to OpenCMISS.
+    int vt = -1;
+    if (getVariableType(name, &vt) == 0)
+    {
+        if (vt == StateType) *index = model->getVariableIndex(name, csim::StateType);
+        else if (vt == KnownType) *index = model->getVariableIndex(name, csim::InputType);
+        else if (vt == WantedType) *index = model->getVariableIndex(name, csim::OutputType);
+        else *index = model->getVariableIndex(name, csim::IndependentType);
+        return 0;
+    }
+    std::cerr << "CellMLModelDefinition::getVariableIndex -- unable to get the type of variable " << name << std::endl;
+    return -1;
+#else
   iface::cellml_api::Model* model = static_cast<iface::cellml_api::Model*>(mModel);
   if (!model && !mCodeInformation && !mAnnotations)
   {
@@ -369,6 +488,7 @@ int CellMLModelDefinition::getVariableIndex(const char* name,int* index)
 
   *index = i->second;
   return 0;
+#endif
 }
 
 int CellMLModelDefinition::flagVariable
@@ -377,6 +497,10 @@ int CellMLModelDefinition::flagVariable
  std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount
 )
 {
+#ifdef CELLML_USE_CSIM
+	std::cerr << "CellMLModelDefinition::flagVariable -- not implemented with CSim" << std::endl;
+	return -2;
+#else
   if (!mCodeInformation)
   {
     std::cerr << "CellMLModelDefinition::flagVariable -- missing model?" << std::endl;
@@ -494,10 +618,16 @@ int CellMLModelDefinition::flagVariable
   }
   ct->release_ref();
   return 0;
+#endif
 }
 
 int CellMLModelDefinition::setVariableAsKnown(const char* name)
 {
+#ifdef CELLML_USE_CSIM
+    int code = model->setVariableAsInput(name);
+    if (code < 0) return code;
+    return 0;
+#else
   std::vector<iface::cellml_services::VariableEvaluationType> vets;
   // initially, only allow parameters to be controlled by OpenCMISS(cm)
   vets.push_back(iface::cellml_services::CONSTANT);
@@ -505,10 +635,16 @@ int CellMLModelDefinition::setVariableAsKnown(const char* name)
   //vets.push_back(iface::cellml_services::FLOATING);
   int code = flagVariable(name, KnownType, vets, mNumberOfKnownVariables, mParameterCounter);
   return code;
+#endif
 }
 
 int CellMLModelDefinition::setVariableAsWanted(const char* name)
 {
+#ifdef CELLML_USE_CSIM
+    int code = model->setVariableAsOutput(name);
+    if (code < 0) return code;
+    return 0;
+#else
   std::vector<iface::cellml_services::VariableEvaluationType> vets;
   // can't flag state variables
   //vets.push_back(iface::cellml_services::STATE_VARIABLE);
@@ -520,10 +656,36 @@ int CellMLModelDefinition::setVariableAsWanted(const char* name)
   vets.push_back(iface::cellml_services::CONSTANT);
   int code = flagVariable(name, WantedType, vets, mNumberOfWantedVariables, mIntermediateCounter);
   return code;
+#endif
 }
 
 int CellMLModelDefinition::instantiate()
 {
+#ifdef CELLML_USE_CSIM
+    int code = model->instantiate();
+    if (code == csim::CSIM_OK)
+    {
+        nBound = 1;
+        nRates = model->numberOfStateVariables();
+        nAlgebraic = model->numberOfOutputVariables();
+        nConstants = model->numberOfInputVariables();
+        mParameterCounter = nConstants;
+        mStateCounter = nRates;
+        mIntermediateCounter = nAlgebraic;
+        mInitialiseFunction = model->getInitialiseFunction();
+        // call the initialise function to get all the initial values - better than relying on initial_value attributes
+        // in the CellML model?
+        mInitKnown = std::vector<double>(mParameterCounter);
+        mInitWanted = std::vector<double>(mIntermediateCounter);
+        mInitStates = std::vector<double>(mStateCounter);
+        mInitialiseFunction(mInitStates.data(), mInitWanted.data(), mInitKnown.data());
+        // save the pointer to the RHS routine.
+        mModelFunction = model->getModelFunction();
+        return 0;
+    }
+    std::cerr << "CellMLModelDefinition::instantiate: unable to instantiate the CSim model: " << code << std::endl;
+    return code;
+#else
   int code = -1;
   std::wstring codeString = getModelAsCCode(mModel,mCevas,mAnnotations);
   if (codeString.length() > 1)
@@ -603,11 +765,13 @@ int CellMLModelDefinition::instantiate()
     code = -3;
   }
   return code;
+#endif
 }
 
 /*
  * Local methods
  */
+#ifndef CELLML_USE_CSIM
 static CVpair splitName(const char* s)
 {
   CVpair p;
@@ -625,7 +789,9 @@ static CVpair splitName(const char* s)
   }
   return p;
 }
+#endif
 
+#ifndef CELLML_USE_CSIM
 static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::Model* model,
 		void* _cevas, const char* name)
 {
@@ -666,6 +832,7 @@ static iface::cellml_api::CellMLVariable* findLocalVariable(iface::cellml_api::M
   }
   return v;
 }
+#endif
 
 #if 0
 // Bit of a hack, but will do the job until the full URI functionality in the current trunk CellML API makes it into a release - or could look at using the xmlURIPtr that comes with libxml2...
@@ -710,6 +877,7 @@ static char* getURIFromURIWithFragmentID(const char* uri)
 }
 */
 
+#ifndef CELLML_USE_CSIM
 wchar_t* string2wstring(const char* str)
 {
   if (str)
@@ -723,7 +891,9 @@ wchar_t* string2wstring(const char* str)
   }
   return((wchar_t*)NULL);
 }
+#endif
 
+#ifndef CELLML_USE_CSIM
 static void clearCodeAssignments(std::wstring& s,const wchar_t* array,int count)
 {
   for (int i=0;i<count;i++)
@@ -739,7 +909,9 @@ static void clearCodeAssignments(std::wstring& s,const wchar_t* array,int count)
     s.replace(s.find(search),search.size(),r);
   }
 }
+#endif
 
+#ifndef CELLML_USE_CSIM
 std::wstring 
 CellMLModelDefinition::getModelAsCCode(void* _model,void* _cevas,void* _annotations)
 {
@@ -1101,3 +1273,4 @@ CellMLModelDefinition::getModelAsCCode(void* _model,void* _cevas,void* _annotati
   }
   return code;
 }
+#endif

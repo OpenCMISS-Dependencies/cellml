@@ -5,6 +5,10 @@
 #include <vector>
 #include <IfaceCCGS.hxx>
 
+#ifdef CELLML_USE_CSIM
+#include "csim/model.h"
+#endif
+
 /**
  * The primary object used to define a CellML model for use in openCMISS.
  *
@@ -95,6 +99,7 @@ class CellMLModelDefinition
    */
   int instantiate();
 
+#ifndef CELLML_USE_CSIM
   /**
    * Set the compile command to use to compile the generated code into a dynamic shared object.
    * @param command The compile command.
@@ -111,6 +116,7 @@ class CellMLModelDefinition
   {
     return mCompileCommand;
   }
+#endif
 
   /**
    * Set the save temporary files flag.
@@ -129,27 +135,36 @@ class CellMLModelDefinition
     return mSaveTempFiles;
   }
 
+
   /**
    * Check model instantiation.
    * @return True if the model is instantiated; false otherwise.
    */
-  bool instantiated()
-  {
-    return mInstantiated;
-  }
+  bool instantiated();
 
   int32_t nBound;
   int32_t nRates;
   int32_t nAlgebraic;
   int32_t nConstants;
 
+  inline void callModelFunction(double VOI,double* STATES,double* RATES,
+                                double* WANTED,double* KNOWN)
+  {
+#ifdef CELLML_USE_CSIM
+      mModelFunction(VOI, STATES, RATES, WANTED, KNOWN);
+#else
+      rhsRoutine(VOI, STATES, RATES, WANTED, KNOWN);
+#endif
+  }
+
+ private:
+#ifndef CELLML_USE_CSIM
   // loaded from the generated and compiled DSO
   /* Compute the RHS of the system of the ODE system
    */
   void (*rhsRoutine)(double VOI,double* STATES,double* RATES,
     double* WANTED,double* KNOWN);
 
- private:
   /**
    * Generate C code for the given CellML model.
    * @param model The CellML model for which to generate C code.
@@ -158,9 +173,18 @@ class CellMLModelDefinition
    * @return The generated code, if successful; and empty string otherwise.
    */
   std::wstring getModelAsCCode(void* model,void* cevas,void* annotations);
+#endif
+
   int flagVariable(const char* name, int type,
                    std::vector<iface::cellml_services::VariableEvaluationType> vets,int& count, int& specificCount);
   std::string mURL;
+
+#ifdef CELLML_USE_CSIM
+  csim::Model* model;
+  csim::InitialiseFunction mInitialiseFunction;
+  csim::ModelFunction mModelFunction;
+  std::vector<double> mInitStates, mInitWanted, mInitKnown;
+#else
   std::string mTmpDirName;
   bool mTmpDirExists;
   std::string mCodeFileName;
@@ -168,9 +192,10 @@ class CellMLModelDefinition
   std::string mDsoFileName;
   bool mDsoFileExists;
   std::string mCompileCommand;
-  bool mSaveTempFiles;
-  void* mHandle;
   bool mInstantiated;
+#endif
+
+  bool mSaveTempFiles;
   std::map<std::pair<int,int>, double> mInitialValues;
   std::map<std::string, int> mVariableTypes;
   std::map<std::string, int> mVariableIndices;
@@ -178,9 +203,12 @@ class CellMLModelDefinition
   // need to access these?
  public:
   void* mModel;
+#ifndef CELLML_USE_CSIM
+  void* mHandle;
   void* mCodeInformation;
   void* mAnnotations;
   void* mCevas;
+#endif
   int mNumberOfWantedVariables;
   int mNumberOfKnownVariables;
   int mNumberOfIndependentVariables;
