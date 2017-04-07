@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-PROJECT(cellml-api VERSION 1.1 LANGUAGES Fortran CXX)
+PROJECT(cellml-api VERSION 1.1 LANGUAGES CXX Fortran)
 
 option(BUILD_TESTS "${PROJECT_NAME} - Build tests" ON)
 option(PACKAGE_CONFIG_DIR "Directory for package config files (relative to CMAKE_INSTALL_PREFIX)" "lib/cmake")
@@ -52,7 +52,7 @@ target_link_libraries(cellml_model_definition INTERFACE cellml_api)
 if(BUILD_TESTS)
     enable_testing()
     add_executable(test_cellml_model_definition tests/src/test_cellml_model_definition.f90)
-    set_target_properties(test_cellml_model_definition PROPERTIES LINKER_LANGUAGE Fortran)
+    #set_target_properties(test_cellml_model_definition PROPERTIES LINKER_LANGUAGE Fortran)
     target_link_libraries(test_cellml_model_definition
         cellml_api
         cellml_model_definition
