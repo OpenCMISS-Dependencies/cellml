@@ -86,12 +86,12 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake
 	"set(${PROJECT_NAME}_IMPORT_PREFIX \${_IMPORT_PREFIX})\r\n")
 if (CELLML_USE_CSIM)
     file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake	
-        "find_dependency(CSim ${CSIM_VERSION})\r\n"
+        "set(CSIM_FIND_SYSTEM ${CSIM_FIND_SYSTEM})\r\nfind_dependency(CSim ${CSIM_VERSION})\r\n"
     )
 else()
     file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake	
-        "find_dependency(LIBCELLML ${LIBCELLML_VERSION})\r\n"
-        "find_dependency(LibXml2 ${LIBXML2_VERSION})\r\n"
+        "set(LIBCELLML_FIND_SYSTEM ${LIBCELLML_FIND_SYSTEM})\r\nfind_dependency(LIBCELLML ${LIBCELLML_VERSION})\r\n"
+        "set(LIBXML2_FIND_SYSTEM ${LIBXML2_FIND_SYSTEM})\r\nfind_dependency(LibXml2 ${LIBXML2_VERSION})\r\n"
     )
 endif()
 file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/cellml-config-dependencies.cmake
