@@ -125,12 +125,12 @@ CellMLModelDefinition::CellMLModelDefinition(const char* url) :
   mTmpDirExists = false;
   mCodeFileExists = false;
   mDsoFileExists = false;
-  mSaveTempFiles = false;
   mInstantiated = false;
   mCodeInformation = NULL;
   mAnnotations = NULL;
   mCevas = NULL;
 #endif
+  mSaveTempFiles = false;
   nBound = -1;
   nRates = -1;
   nAlgebraic = -1;
